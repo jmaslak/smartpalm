@@ -21,11 +21,6 @@
 #include "tnc.h"
 #include "utils.h"
 
-struct Message {
-	char call[10];
-	char message[68];
-	char id[6];
-};
 
 static void    handleAX25(char * theData);
 static void    parse_APRS (char * payload, int * speed, int * heading, int * distance, int * bearing,

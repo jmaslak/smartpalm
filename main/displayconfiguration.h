@@ -10,6 +10,7 @@
 #ifndef SP_displayconfiguration_H_
 #define SP_displayconfiguration_H_ 1
 
-extern void initConfiguration(void);
+extern void    initConfiguration(void);
+extern Boolean APRSConfigurationHandleEvent(EventPtr event);
 
 #endif

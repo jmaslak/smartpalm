@@ -22,7 +22,6 @@
 
 static void    APRSConfigurationInit(void);
 static void    APRSConfigurationUpdate(void);
-static Boolean APRSConfigurationHandleEvent(EventPtr event);
 static char *  checkAPRSConfiguration(void);
 static void    saveAPRSConfiguration(void);
 
@@ -49,7 +48,7 @@ static void APRSConfigurationUpdate(void)
 	SetFieldTextFromStr(APRSConfigurationStopBeaconField,    StrIToA(buffer, getStopBeaconRate()));
 }
 
-static Boolean APRSConfigurationHandleEvent(EventPtr event)
+Boolean APRSConfigurationHandleEvent(EventPtr event)
 {
 	Boolean	handled;
 	char * error;

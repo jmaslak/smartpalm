@@ -13,6 +13,8 @@
 #include "SmartPalm.h"
 #include "statistics.h"
 
+#include "displaysummary.h"
+
 
 static unsigned int digipeat_count;
 static unsigned int network_history[9];
