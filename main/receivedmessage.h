@@ -19,5 +19,6 @@ struct Message {
 extern void storeMessage(char * payload, char * src);
 extern UInt receivedMessageCount(void);
 extern void receivedMessageDelete(void);
+extern void sendAck(char * payload, char * src);
 
 #endif

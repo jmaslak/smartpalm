@@ -35,6 +35,7 @@ static void    updateMySummary (float lat, float lon, int speed, int heading, UI
 static void    updateRemoteSummary (int speed, int heading, int bearing, float distance,
 				    char * call, char * digis, char * payload);
 static void    parseThirdPartyHeader (char * payload, char * src, int * payload_offset, char * digipeaters);
+static void    sendResetResponse(char * src);
 
 static char    status[37];
 
@@ -242,6 +243,8 @@ static void handle_message (char * payload, char * data, char * src) {
 //			rejMessage(payload+13, src);  // XXX
 		} else if (!StrNCompare(payload+10, "!SYSRESET!", 10)) {
 			tncInit();  /* Respond by re-initializing the TNC */
+			sendAck(payload+10, src);
+			sendResetResponse(src);
 		} else {
 			storeMessage(payload+10, src);
 		}
@@ -249,6 +252,27 @@ static void handle_message (char * payload, char * data, char * src) {
 
 	StrCopy(data, payload);
 	return;
+}
+
+static void sendResetResponse(char * src) {
+	char packet[79];
+	char formatted_call[20];
+	static int nextresettime = 0;
+	unsigned int i;
+
+	if (nextresettime < TimGetSeconds()) {
+		nextresettime = TimGetSeconds() + MINACKWAIT;
+
+		StrCopy(formatted_call, src);
+		i=0;
+		while (src[i] != '\0') { i++; }
+		for ( ; i<9; i++ ) {
+			formatted_call[i] = ' ';
+		}
+		formatted_call[9] = '\0';
+		StrPrintF(packet, ":%s:SmartPalm Reset Successful!", formatted_call);
+		tncSendPacket(packet);
+	}
 }
 
 static Boolean localRecipient(char * payload) {

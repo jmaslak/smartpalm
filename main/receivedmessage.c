@@ -157,3 +157,41 @@ static void addToDatabase(char * call, char * mpart, char * id, Word database) {
 	DmCloseDatabase(dbref);
 };	
 
+void sendAck(char * payload, char * src) {
+	char mpart[68];
+	char id[6];  // lastid
+	char packet[20]; // Max ACK packet
+	char formatted_call[10];
+
+	int i, eom;
+	char * idptr;
+
+	StrCopy(mpart, payload);
+	
+	eom = StrLen(mpart) - 1;
+
+	idptr = &(mpart[eom+1]);
+	for (i=5; i>0; i--) {
+		if (mpart[eom-i] == '{') {
+			idptr = &(mpart[eom-i+1]);
+		}
+	}
+
+	StrCopy(id, idptr);
+	*(idptr-1) = '\0';
+
+	if (nextacktime < TimGetSeconds()) {
+		if (*id != '\0') {
+			nextacktime = TimGetSeconds() + MINACKWAIT;
+			StrCopy(formatted_call, src);
+			i=0;
+			while (src[i] != '\0') { i++; }
+			for ( ; i<9; i++ ) {
+				formatted_call[i] = ' ';
+			}
+			formatted_call[9] = '\0';
+			StrPrintF(packet, ":%s:ack%s", formatted_call, id);
+			tncSendPacket(packet);
+		}
+	}
+}
