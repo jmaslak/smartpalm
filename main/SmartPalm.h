@@ -33,7 +33,7 @@
 #define dbSent     				   3
 
 /* Never send an ACK more frequently than once ever MINACKWAIT seconds */
-#define MINACKWAIT (30)
+#define MINACKWAIT (30l)
 
 /* Defaults to initialize database */
 #define DEFAULT_DIGIPEATER_PATH  ("WIDE")

@@ -25,6 +25,8 @@
 
 static void     addToDatabase(char * call, char * mpart, char * id, Word database);
 static VoidHand inDatabase(char * call, char * mpart, char * id, Word database);
+static UInt32	nextacktime = 0l;
+
 
 void receivedMessageDelete(void)
 {
@@ -64,8 +66,6 @@ void storeMessage(char * payload, char * src) {
 	int i, eom;
 	char * idptr;
 
-	static UInt lastacktime = 0;
-
 	StrCopy(mpart, payload);
 	
 	eom = StrLen(mpart) - 1;
@@ -80,8 +80,9 @@ void storeMessage(char * payload, char * src) {
 	StrCopy(id, idptr);
 	*(idptr-1) = '\0';
 
-	if ((lastacktime + MINACKWAIT) < TimGetSeconds()) {
+	if (nextacktime < TimGetSeconds()) {
 		if (*id != '\0') {
+			nextacktime = TimGetSeconds() + MINACKWAIT;
 			StrCopy(formatted_call, src);
 			i=0;
 			while (src[i] != '\0') { i++; }
@@ -91,7 +92,6 @@ void storeMessage(char * payload, char * src) {
 			formatted_call[9] = '\0';
 			StrPrintF(packet, ":%s:ack%s", formatted_call, id);
 			tncSendPacket(packet);
-			lastacktime = TimGetSeconds();
 		}
 	}
 
