@@ -12,5 +12,6 @@
 
 extern Boolean initSerial(void);
 extern void    initStatus(void);
+extern void    closeSerial(void);
 
 #endif

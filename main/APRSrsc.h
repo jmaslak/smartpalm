@@ -70,8 +70,3 @@
 #define APRSSummaryPreferencesItem		2001
 #define APRSSummaryBeaconNowItem		2002
 #define APRSSummarySendMessageItem		2003
-
-//	Databases
-#define dbMain     				   1
-#define dbReceived     				   2
-#define dbSent     				   3

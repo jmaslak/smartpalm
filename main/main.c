@@ -17,6 +17,7 @@
 #include "SmartPalm.h"
 #include "main.h"
 
+#include "database.h"
 #include "displaysummary.h"
 #include "statistics.h"
 #include "tnc.h"
@@ -25,70 +26,99 @@
 
 
 static Boolean StartApplication(void);
-static void    createDatabases(void);
-
+static void    StopApplication(void);
+static Boolean ApplicationHandleEvent(EventPtr event);
+static void    EventLoop(void);
 
 /* Returns true on success, false on failure */
 static Boolean StartApplication(void)
 {
-	int i;
-	DmOpenRef dbref;
-
 	if (!initSerial()) {
 		return false;
 	}
 
 	initSummary();
 	initStatistics();
-	
-	dbref = DmOpenDatabaseByTypeCreator(dbMain, getCreatorID(), dmModeReadWrite);
-	if (!dbref) {
-		createDatabases();
-       	} else {
-		DmCloseDatabase(dbref);
-		readConfiguration();
-	}
-
+	initDatabase();
+	readConfiguration();
 	tncInit();
 	tncConfig();
 	
 	return false;
 }
 
-static void createDatabases(void)
+static void StopApplication(void)
 {
-	DmOpenRef dbref;
-	LocalID dbID;
-	LocalID appInfoID;
-	MemHandle h;
-	UInt16 version = 1;
-	UInt16 cardNo;
-
-	DmCreateDatabase(CARDNO, "main-APRD",     getCreatorID(), dbMain,     false);
-	DmCreateDatabase(CARDNO, "received-APRD", getCreatorID(), dbReceived, false);
-	DmCreateDatabase(CARDNO, "sent-APRD",     getCreatorID(), dbSent,     false);
-	
-	dbref = DmOpenDatabaseByTypeCreator(dbMain, getCreatorID(), dmModeReadWrite);
-
-	DmOpenDatabaseInfo(dbref, &dbID, NULL, NULL, &cardNo, NULL);
-	
-	DmOpenDatabaseInfo(dbref, &dbID, NULL, NULL, &cardNo, NULL);
-	h = DmNewHandle(dbref, sizeof(struct ConfigurationInfo));
-	appInfoID = MemHandleToLocalID(h);
-	
-	DmSetDatabaseInfo(cardNo, dbID, NULL, NULL, &version, NULL, NULL, NULL, NULL, &appInfoID, NULL, NULL, NULL);
-
-	DmCloseDatabase(dbref);
-	
-	conf.magic = MAGIC;
-	StrCopy(conf.digipeater_path, "RELAY,WIDE2-2");
-	StrCopy(conf.callsign, "N0CALL");
-	conf.low_speed = 5;
-	conf.high_speed = 45;
-	conf.turn_threshold = 35;
-	conf.turn_beacon_rate = 7;
-	conf.fast_beacon_rate = 90;
-	conf.stop_beacon_rate = 600;
-
-	writeConfiguration();
+	closeSerial();
 }
+
+static Boolean ApplicationHandleEvent(EventPtr event)
+{
+	FormPtr	frm;
+	Int		formId;
+	Boolean	handled = false;
+
+       	if (event->eType == frmLoadEvent) {
+		// Load the form resource specified in the event then activate the form.
+		formId = event->data.frmLoad.formID;
+		frm = FrmInitForm(formId);
+		FrmSetActiveForm(frm);
+
+		// Set the event handler for the form.  The handler of the currently 
+		// active form is called by FrmDispatchEvent each time it receives an event.
+		switch (formId) {
+		case APRSSummaryForm:
+			FrmSetEventHandler(frm, APRSSummaryHandleEvent);
+			break;
+
+		case APRSReadForm:
+			FrmSetEventHandler(frm, APRSReadHandleEvent);
+			break;
+
+		case APRSSendForm:
+			FrmSetEventHandler(frm, APRSSendHandleEvent);
+			break;
+			
+		case APRSConfigurationForm:
+			FrmSetEventHandler(frm, APRSConfigurationHandleEvent);
+			break;
+		}
+		
+		handled = true;
+	}
+	
+	return handled;
+}
+
+static void EventLoop(void)
+{
+	EventType event;
+	Word error;
+	
+	do {
+		// Get the next available event.
+		EvtGetEvent(&event, 0);
+		if (! SysHandleEvent(&event))
+		  if (! MenuHandleEvent(0, &event, &error))
+		    if (! ApplicationHandleEvent(&event))
+		      FrmDispatchEvent(&event);
+		}
+	while (event.eType != appStopEvent);
+}
+
+
+DWord PilotMain(Word cmd, Ptr cmdPBP, Word launchFlags)
+{
+        // P14.  Check for a normal launch.
+	if (cmd == sysAppLaunchCmdNormalLaunch) {
+		// Initialize the application's global variables and database.
+		if (StartApplication() == 0) {
+			FrmGotoForm(APRSSummaryForm);
+			EventLoop();
+			StopApplication();
+		}
+	}
+	return 0;
+}
+
+
