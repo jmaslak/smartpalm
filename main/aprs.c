@@ -85,18 +85,17 @@ static void handleAX25(char * theData) {
 	char call[10];
 	char digipeaters[256];
 	char remote_data[512];
-	char remote_call[10];
 	int  remote_speed, remote_heading, remote_distance, remote_bearing;
 	
 	if (!getAX25Header(theData, call, digipeaters, payload)) {
 		return;
 	}
 
-	parse_APRS(payload, &remote_speed, &remote_heading, &remote_distance, &remote_bearing, remote_data, remote_call);
-	updateRemoteSummary(remote_speed, remote_heading, remote_bearing, remote_distance, remote_call,
+	parse_APRS(payload, &remote_speed, &remote_heading, &remote_distance, &remote_bearing, remote_data, call);
+	updateRemoteSummary(remote_speed, remote_heading, remote_bearing, remote_distance, call,
 			    digipeaters, remote_data);
 
-	if (!StrCompare(remote_call, getCallsign())) {
+	if (!StrCompare(call, getCallsign())) {
 		incrementDigipeatCount();
 	}
 }

@@ -107,7 +107,7 @@ static void APRSSummaryUpdate(void)
 	SetFieldTextFromStr(APRSSummaryCourseField, s);
 
 	SetFieldTextFromStr(APRSSummaryPathField, getDigipeaterPath());
-
+	
 	if (remote_call[0] != '\0') {
 		SetFieldTextFromStr(APRSSummaryRemoteCallField, remote_call);
 
