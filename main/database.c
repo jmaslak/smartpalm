@@ -62,8 +62,6 @@ static void createDatabases(void)
 
 inline UInt32 getCreatorID(void)
 {
-/*  JCM: I wonder what I was thinking here...
-    Now I know... */
         char str[5];
 	int i;
 	char ret[4];
@@ -76,6 +74,7 @@ inline UInt32 getCreatorID(void)
 	}
 	p = ret;
 
+	return *((UInt32 * ) p);
 //	return * ((UInt32 *) CREATORID);
 }
 	

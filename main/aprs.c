@@ -372,12 +372,12 @@ void sendBeacon (void)
 //		StrPrintF(packet,
 //			  "/%s%s%sz%s%c/%s%c>%s/%s/%s",
 //			  day, hour, minute, lat, latdir, lon, londir, hd, spd, status);
-//		StrPrintF(packet,
-//			  "@%s%s%sz%s%c/%s%c>%s",
-//			  day, hour, minute, lat, latdir, lon, londir, status);
 		StrPrintF(packet,
-			  "=%s%c/%s%c>%s",
-			  lat, latdir, lon, londir, status);
+			  "@%s%s%sz%s%c/%s%c>%s",
+			  day, hour, minute, lat, latdir, lon, londir, status);
+//		StrPrintF(packet,
+//			  "=%s%c/%s%c>%s",
+//			  lat, latdir, lon, londir, status);
 	}
 
 	tncSendPacket(packet);
