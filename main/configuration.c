@@ -160,3 +160,12 @@ void setStopBeaconRate(int rate)
 	conf.stop_beacon_rate = rate;
 	writeConfiguration();
 }
+
+int configuredCallsign(void)
+{
+	if (!StrNCompare(conf.callsign, "N0CALL", 6)) {
+		return 0;
+	}
+
+	return 1;
+}

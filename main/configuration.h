@@ -41,5 +41,6 @@ extern void   setTurnThreshold(int threshold);
 extern void   setTurnBeaconRate(int rate);
 extern void   setFastBeaconRate(int rate);
 extern void   setStopBeaconRate(int rate);
+extern int    configuredCallsign(void);
 
 #endif

@@ -199,6 +199,8 @@ void tncInit(void)
 
 void tncSendPacket (char * s)
 {
+	if (!configuredCallsign()) { return; }
+	
 	processPendingSerialCharacter(0);
 	tncSend("k\r");
 	processPendingSerialCharacter(0);
