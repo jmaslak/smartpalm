@@ -323,11 +323,11 @@ void setLastHeardPayload(char * data) {
 	aprs_received = 1;
 }
 
-int getMyLatitude(void) {
+float getMyLatitude(void) {
 	return mylat;
 }
 
-int getMyLongitude(void) {
+float getMyLongitude(void) {
 	return mylon;
 }
 
