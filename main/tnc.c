@@ -19,7 +19,6 @@
 
 static UInt    gSerialRefNum;
 static VoidPtr gSerialBuffer = NULL;
-static char    status[37];
 static Boolean getSerialCharacter(char * theData, int size, int * current_character, unsigned int timeout);
 static Boolean processPendingSerialCharacter (unsigned int timeout);
 static void    tncSend(char * s);
@@ -52,10 +51,6 @@ Boolean initSerial(void) {
 
 	return true;
 }
-
-void initStatus(void) {
-	StrCopy(status, VERSION_STRING);
-}	
 
 void closeSerial(void) {
 	if (gSerialBuffer != NULL) {
@@ -215,7 +210,7 @@ static void tncInit (void)
 	processPendingSerialCharacter(0);
 }
 
-static void tncSendPacket (char * s)
+void tncSendPacket (char * s)
 {
 	int i;
 	

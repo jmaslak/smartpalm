@@ -15,17 +15,17 @@ static void    APRSSummaryUpdate(void);
 static Boolean APRSSummaryHandleEvent(EventPtr event);
 static Boolean APRSSummaryHandleMenuEvent(Word menuID);
 
-static int  heading;
-static int  speed;
-static char remote_call[10];  // KCxABD-1
-static int  remote_speed;
-static int  remote_heading;
-static int  remote_distance;
-static int  remote_bearing;
-static char remote_digipeaters[256];
-static char remote_data[512];
-float mylat, mylon;
-
+static int    heading;
+static int    speed;
+static char   remote_call[10];  // KCxABD-1
+static int    remote_speed;
+static int    remote_heading;
+static int    remote_distance;
+static int    remote_bearing;
+static char   remote_digipeaters[256];
+static char   remote_data[512];
+static float  mylat, mylon;
+static int    aprs_received = 0;
 
 void initSummary(void) {
 	heading = -1;
@@ -39,6 +39,7 @@ void initSummary(void) {
 	remote_data[0] = '\0';
 	mylat = 180;
 	mylon = 0;
+	aprs_received = 1;
 }
 
 static void APRSSummaryInit(void)
@@ -66,8 +67,8 @@ static void APRSSummaryUpdate(void)
 	}
 	SetFieldTextFromStr(APRSSummaryNetworkField, s);
 
-	if (utc > 0) {
-		TimSecondsToDateTime(utc, &dt);
+	if (getUTC() > 0) {
+		TimSecondsToDateTime(getUTC(), &dt);
 		
 		timeformat(month,  dt.month,     2);
 	        timeformat(day,    dt.day,       2);
@@ -204,11 +205,7 @@ static Boolean APRSSummaryHandleEvent(EventPtr event)
 	    
 		EvtResetAutoOffTimer();
 		
-		if (processPendingSerialCharacter(0) && (aprs_received)) {
-			if ((utc > 0) && (lastid == 0)) {
-				lastid = utc % 9000;
-			}
-		}
+		processPendingSerialCharacter(0);
 			
 		smartBeacon();
 		
@@ -257,3 +254,73 @@ static Boolean APRSSummaryHandleMenuEvent(Word menuID)
 	return (handled);
 }
 
+void setMyLatitude(float lat) {
+	mylat = lat;
+	aprs_received = 1;
+}
+
+void setMyLongitude(float lon) {
+	mylon = lon;
+	aprs_received = 1;
+}
+
+void setMySpeed(int sp) {
+	speed = sp;
+	aprs_received = 1;
+}
+
+void setMyHeading(int head) {
+	heading = head;
+	aprs_received = 1;
+}
+
+void setLastHeardCall(char * call) {
+	StrCopy(remote_call, call);
+	aprs_received = 1;
+}
+
+void setLastHeardSpeed(int sp) {
+	remote_speed = sp;
+	aprs_received = 1;
+}
+
+void setLastHeardDistance(int dist) {
+	remote_distance = dist;
+	aprs_received = 1;
+}
+
+void setLastHeardBearing(int bear) {
+	remote_bearing = bear;
+	aprs_received = 1;
+}
+
+void setLastHeardHeading(int head) {
+	remote_heading = head;
+	aprs_received = 1;
+}
+
+void setLastHeardDigipeaters(char * digis) {
+	StrCopy(remote_digipeaters, digis);
+	aprs_received = 1;
+}
+
+void setLastHeardPayload(char * data) {
+	StrCopy(remote_data, data);
+	aprs_received = 1;
+}
+
+int getMyLatitude(void) {
+	return my_lat;
+}
+
+int getMyLongitude(void) {
+	return my_lon;
+}
+
+int getMySpeed(void) {
+	return my_speed;
+}
+
+int getMyHeading(void) {
+	return my_heading;
+}

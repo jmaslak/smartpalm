@@ -387,4 +387,3 @@ void positionformat(char * d, float s, int length, int precision)
 
 	timeformat(d+length-precision, (int) s, precision);
 }
-

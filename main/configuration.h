@@ -14,7 +14,7 @@ extern void   initconfiguration(void);
 extern void   writeConfiguration(void);
 extern void   readConfiguration (void);
 extern char * getDigipeaterPath(void);
-exterb char * getCallsign(void);
+extern char * getCallsign(void);
 extern int    getLowSpeed(void);
 extern int    getHighSpeed(void);
 extern int    getTurnThreshold(void);

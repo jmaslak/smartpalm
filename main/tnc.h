@@ -11,7 +11,7 @@
 #define SP_tnc_H_ 1
 
 extern Boolean initSerial(void);
-extern void    initStatus(void);
 extern void    closeSerial(void);
+extern void    tncSendPacket (char * s);
 
 #endif

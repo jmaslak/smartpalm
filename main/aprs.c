@@ -7,10 +7,19 @@
  *
  */
 
+#include <PalmOS.h>
+#include <PalmCompatibility.h>
+
 #include "SmartPalm.h"
 #include "aprs.h"
 
+#include "configuration.h"
+#include "displaysend.h"
+#include "displaysummary.h"
+#include "receivedmessage.h"
+#include "statistics.h"
 #include "tnc.h"
+#include "utils.h"
 
 struct Message {
 	char call[10];
@@ -19,20 +28,29 @@ struct Message {
 };
 
 static void    handleAX25(char * theData);
-static void    ackMessage(char * payload, char * src);
 static void    parse_APRS (char * payload, int * speed, int * heading, int * distance, int * bearing,
 			   char * data, char * src);
 static void    handle_message (char * payload, char * data, char * src);
-static void    getNextID(char * id);
 static Boolean localRecipient(char * payload);
 static void    parse_extension (char * extension, int * speed, int * heading, char * data);
 static void    parse_location (char * location, float * lat, float * lon);
 static Boolean getAX25Header(char * theData, char * call, char * digipeaters, char * payload);
 static void    handleGPRMC(char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds);
+static void    updateMySummary (float lat, float lon, int speed, int heading, UInt32 utc);
+static void    updateRemoteSummary (int speed, int heading, int bearing, int distance,
+				    char * call, char * digis, char * payload);
 
-static lastid = 0;
-	
+static char    status[37];
+
+void initStatus(void) {
+	StrCopy(status, VERSION_STRING);
+}	
+
 void handlePacket(char * theData) {
+	float mylat, mylon;
+	int speed, heading;
+	UInt32 utc;
+	
 	if (theData[0] == '\0') { return; }
 	
 	// Strip out any "cmd:" strings
@@ -42,29 +60,49 @@ void handlePacket(char * theData) {
 	
 	if (!StrNCompare(theData, "$GPRMC", 6)) {
 		handleGPRMC(theData, &mylat, &mylon, &speed, &heading, &utc);
-		aprs_received = 1;
+		updateMySummary(mylat, mylon, speed, heading, utc);
 	} else {
 		handleAX25(theData);
 	}
+}
+
+static void updateMySummary (float lat, float lon, int speed, int heading, UInt32 utc) {
+	setMyLatitude(lat);
+	setMyLongitude(lon);
+	setMySpeed(speed);
+	setMyHeading(heading);
+	setUTC(utc);
+}
+
+static void updateRemoteSummary (int speed, int heading, int bearing, int distance,
+				 char * call, char * digis, char * payload) {
+	setLastHeardSpeed(speed);
+	setLastHeardHeading(heading);
+	setLastHeardBearing(bearing);
+	setLastHeardDistance(distance);
+	setLastHeardCall(call);
+	setLastHeardDigipeaters(digis);
+	setLastHeardPayload(payload);
 }
 
 static void handleAX25(char * theData) {
 	char payload[512];
 	char call[10];
 	char digipeaters[256];
+	char remote_data[512];
+	char remote_call[10];
+	int  remote_speed, remote_heading, remote_distance, remote_bearing;
 	
 	if (!getAX25Header(theData, call, digipeaters, payload)) {
 		return;
 	}
 
-	StrCopy(remote_call, call);
-	StrCopy(remote_digipeaters, digipeaters);
-	StrCopy(remote_data, "");
 	parse_APRS(payload, &remote_speed, &remote_heading, &remote_distance, &remote_bearing, remote_data, remote_call);
-	aprs_received = 1;
+	updateRemoteSummary(remote_speed, remote_heading, remote_bearing, remote_distance, remote_call,
+			    digipeaters, remote_data);
 
-	if (!StrCompare(remote_call, conf.callsign)) {
-		digipeat_count++;
+	if (!StrCompare(remote_call, getCallsign())) {
+		incrementDigipeatCount();
 	}
 }
 
@@ -105,8 +143,8 @@ static void parse_APRS (char * payload, int * speed, int * heading, int * distan
 		StrCopy(data, payload);
 	}
 
-	*distance = (int) (computeDistance(mylat, mylon, lat, lon) + .5);
-	*bearing  = (int) (computeBearing (mylat, mylon, lat, lon) + .5);
+	*distance = (int) (computeDistance(getMyLatitude(), getMyLongitude(), lat, lon) + .5);
+	*bearing  = (int) (computeBearing (getMyLatitude(), getMyLongitude(), lat, lon) + .5);
 }
 
 static void handle_message (char * payload, char * data, char * src) {
@@ -129,26 +167,11 @@ static void handle_message (char * payload, char * data, char * src) {
 	return;
 }
 
-static void ackMessage(char * payload, char * src) {
-	if (StrLen(payload) > 5) {
-		return;
-	}
-
-	StrCopy(lastack, payload);
-}
-
-static void getNextID(char * id) {
-	lastid++;
-	if (lastid > 99999) { lastid = 0; }
-
-	StrIToA(id, lastid);
-}
-
 static Boolean localRecipient(char * payload) {
 	int i;
 	char * cp;
 	
-	cp = conf.callsign;
+	cp = getCallsign();
 	for (i=0; i<9; i++) {
 		if (*cp != '\0') {
 			if (*cp != *payload) { return false; }
@@ -325,28 +348,28 @@ void sendBeacon (void)
 	char spd[4], hd[4];
 	DateTimeType dt;
 
-	if ((utc <= 0) || (mylat > 90)) {
+	if ((getUTC() <= 0) || (getMyLatitude() > 90)) {
 		StrPrintF(packet, "%s", status);
 	} else {
-		TimSecondsToDateTime(utc, &dt);
+		TimSecondsToDateTime(getUTC(), &dt);
 		
 	        timeformat(day,    dt.day,       2);
 		timeformat(hour,   dt.hour,      2);
 		timeformat(minute, dt.minute,    2);
 
-		positionformat(lat, mylat, 7, 2);
-		positionformat(lon, mylon, 8, 2);
+		positionformat(lat, getMyLatitude(),  7, 2);
+		positionformat(lon, getMyLongitude(), 8, 2);
 
-		timeformat(spd, sm2nm(speed), 3);
-		timeformat(hd,  heading,      3);
+		timeformat(spd, sm2nm(getMySpeed()), 3);
+		timeformat(hd,  getMyHeading(),      3);
 
-		if (mylat < 0) {
+		if (getMyLatitude() < 0) {
 			latdir = 'S';
 		} else {
 			latdir = 'N';
 		}
 
-		if (mylon < 0) {
+		if (getMyLongitude() < 0) {
 			londir = 'W';
 		} else {
 			londir = 'E';
@@ -377,41 +400,41 @@ void smartBeacon(void)
 	Boolean corner_peg = false;
 
 	
-	if ((utc <= 0) || (mylat > 90)) { return; }
+	if ((getUTC() <= 0) || (getMyLatitude() > 90)) { return; }
 	
-	secs_since_beacon = utc - last_beacon;
+	secs_since_beacon = getUTC() - last_beacon;
 
-	if (secs_since_beacon < conf.turn_beacon_rate) {
-		last_beacon_heading = heading;  // To allow for variation right after a turn
+	if (secs_since_beacon < getTurnBeaconRate()) {
+		last_beacon_heading = getMyHeading();  // To allow for variation right after a turn
 	}
 
-        if (speed < conf.low_speed) {
-		beacon_rate = conf.stop_beacon_rate;
+        if (getMySpeed() < getLowSpeed()) {
+		beacon_rate = getStopBeaconRate();
 	} else {
 //		turn_alarm = 5.0 + ((float) conf.turn_threshold) / ((float) speed);  // Hard Coded!
-		turn_alarm = ((float) conf.turn_threshold) / ((float) speed);
+		turn_alarm = ((float) getTurnThreshold()) / ((float) getMySpeed());
 
-		heading_change = last_beacon_heading - heading;
+		heading_change = last_beacon_heading - getMyHeading();
 		if (heading_change < 0) { heading_change = 0 - heading_change; }
 
-		if ((heading_change > turn_alarm) && (secs_since_beacon > conf.turn_beacon_rate)) {
+		if ((heading_change > turn_alarm) && (secs_since_beacon > getTurnBeaconRate())) {
 //			if (gps_fuzz++ > 2) {  // Throw away first two readings!
 				corner_peg = true;
 //			}
 		}
 
-		if (speed > conf.high_speed) {
-			beacon_rate = conf.fast_beacon_rate;
+		if (getMySpeed() > getHighSpeed()) {
+			beacon_rate = getFastBeaconRate();
 		} else {
-			beacon_rate = (int) (((float) conf.fast_beacon_rate) * ((float) conf.high_speed)
-					     / ((float) speed));
+			beacon_rate = (int) (((float) getFastBeaconRate()) * ((float) getHighSpeed())
+					     / ((float) getMySpeed()));
 		}
 	}
 
 	if ((secs_since_beacon > beacon_rate) || (corner_peg)) {
 		sendBeacon();
-		last_beacon = utc;
-		last_beacon_heading = heading;
+		last_beacon = getUTC();
+		last_beacon_heading = getMyHeading();
 		gps_fuzz = 0;
 	}
 }
