@@ -15,7 +15,7 @@
 
 #include "database.h"
 
-static struct ConfigurationInfo {
+struct ConfigurationInfo {
 	int magic;
 	char digipeater_path[72];
 	char callsign[10];
@@ -77,7 +77,7 @@ void readConfiguration (void)
 	DmDatabaseInfo(cardNo, dbID, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &appInfoID, NULL, NULL, NULL);
 
 	ci = (struct ConfigurationInfo *) MemLocalIDToLockedPtr(appInfoID, cardNo);
-	memcopy(&conf, ci, sizeof(struct ConfigurationInfo));
+	MemMove(&conf, ci, sizeof(struct ConfigurationInfo));
        	MemPtrUnlock(ci);
 
 	DmCloseDatabase(dbref);
@@ -123,13 +123,13 @@ int getStopBeaconRate(void)
 	return conf.stop_beacon_rate;
 }
 
-void setDigipeaterPath(char path)
+void setDigipeaterPath(char * path)
 {
 	StrCopy(conf.digipeater_path, path);
 	writeConfiguration();
 }
 
-void setCallsign(char call)
+void setCallsign(char * call)
 {
 	StrCopy(conf.callsign, call);
 	writeConfiguration();
@@ -160,9 +160,9 @@ void setTurnBeaconRate(int rate)
 	writeConfiguration();
 }
 
-void setSlowBeaconRate(int rate)
+void setFastBeaconRate(int rate)
 {
-	conf.slow_beacon_rate = rate;
+	conf.fast_beacon_rate = rate;
 	writeConfiguration();
 }
 
