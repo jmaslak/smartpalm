@@ -501,6 +501,7 @@ void smartBeacon(void)
 
 		heading_change = last_beacon_heading - getMyHeading();
 		if (heading_change < 0) { heading_change = 0 - heading_change; }
+		if (heading_change > 180) { heading_change = 360 - heading_change; }
 
 		if ((heading_change > turn_alarm) && (secs_since_beacon > getTurnBeaconRate())) {
 //			if (gps_fuzz++ > 2) {  // Throw away first two readings!
