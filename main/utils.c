@@ -317,9 +317,9 @@ float computeDistance (float lat1, float lon1, float lat2, float lon2) {
 }
 
 static float computeCloseDistance (float lat1, float lon1, float lat2, float lon2) {
-	double avglat          = ((lat2 * 10.0) + (lat1 * 10.0)) / 2.0;
-	double deltalat        = ((lat1 * 10.0) - (lat2 * 10.0));
-	double deltalon        = ((lon1 * 10.0) - (lon2 * 10.0));
+	double avglat          = (lat2 + lat1) / 2.0;
+	double deltalat        = (lat1 - lat2);
+	double deltalon        = (lon1 - lon2);
 	double longituderadius = 3956.0 * cos((float) avglat);
 	double longitudefactor = (2.0 * PI * longituderadius) / 360;
 	double latitudefactor  = 69.048;
@@ -334,7 +334,7 @@ static float computeCloseDistance (float lat1, float lon1, float lat2, float lon
 
 	distance = sqrt((float) ((x*x) + (y*y)));
 
-	return distance / 10.0;
+	return distance;
 }
 
 static float computeCloseBearing (float lat1, float lon1, float lat2, float lon2) {
@@ -354,20 +354,16 @@ static float computeCloseBearing (float lat1, float lon1, float lat2, float lon2
 	if (y < 0.0) { y = -y; }
 
 	bearing = ((atan((float) (y / x)) * 180) / PI) + 0;
+
 	if ((deltalon > 0.0) && (deltalat >= 0.0)) {
 		bearing = 90.0 + bearing;
 	} else if ((deltalon <= 0.0) && (deltalat > 0.0)) {
-		bearing = 270.0 - bearing;
-	} else if ((deltalon > 0.0) && (deltalat <= 0.0)) {
 		bearing = 270.0 + bearing;
+	} else if ((deltalon > 0.0) && (deltalat <= 0.0)) {
+		bearing = 270.0 - bearing;
 	} else if ((deltalon <= 0.0) && (deltalat < 0.0)) {
 		bearing = 90.0 - bearing;
 	}
-
-/*	if (x = 0) { return (float) quadrant; } */
-	
-/*	bearing = ((atan((float) (y / x)) * 180) / PI) + (float) (quadrant); */
-/*     	if (bearing >= 90) { bearing = 0; } */
 
 	return bearing;
 }
