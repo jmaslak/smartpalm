@@ -1,3 +1,6 @@
+
+# $Id$
+
 CC = m68k-palmos-gcc
 # CFLAGS = -palmos3.1 -Wall -g -DERROR_CHECK_LEVEL=2 # -g -O2
 CFLAGS = -palmos3.1 -Wall -g # -g -O2
