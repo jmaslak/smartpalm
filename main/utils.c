@@ -356,13 +356,13 @@ static float computeCloseBearing (float lat1, float lon1, float lat2, float lon2
 	bearing = ((atan((float) (y / x)) * 180) / PI) + 0;
 
 	if ((deltalon > 0.0) && (deltalat >= 0.0)) {
-		bearing = 90.0 + bearing;
+		bearing = 270.0 - bearing; /* OK */
 	} else if ((deltalon <= 0.0) && (deltalat > 0.0)) {
-		bearing = 270.0 + bearing;
+		bearing = 90.0 + bearing; /* OK */
 	} else if ((deltalon > 0.0) && (deltalat <= 0.0)) {
-		bearing = 270.0 - bearing;
+		bearing = 270.0 + bearing; /* OK */
 	} else if ((deltalon <= 0.0) && (deltalat < 0.0)) {
-		bearing = 90.0 - bearing;
+		bearing = 90.0 - bearing; /* OK */
 	}
 
 	return bearing;
