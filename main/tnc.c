@@ -185,28 +185,17 @@ void tncConfig (void)
 
 void tncInit (void)
 {
-	processPendingSerialCharacter(0);
 	tncSend("\3\r\r");
 
-	processPendingSerialCharacter(0);
-	tncSend("CR OFF\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("LOC EVERY 0\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("ECHO OFF\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("XFLOW OFF\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("AUTOLF OFF\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("GPSTEXT $GPRMC\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("LTMON EVERY 1\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("LTMHEAD OFF\r\n");
-	processPendingSerialCharacter(0);
-	tncSend("BBSMSGS ON\r\n");
-	processPendingSerialCharacter(0);
+	tncSend("CR OFF\r");
+	tncSend("LOC EVERY 0\r");
+	tncSend("ECHO OFF\r");
+	tncSend("XFLOW OFF\r");
+	tncSend("AUTOLF OFF\r");
+	tncSend("GPSTEXT $GPRMC\r");
+	tncSend("LTMON 1\r");
+	tncSend("LTMHEAD OFF\r");
+	tncSend("BBSMSGS ON\r");
 }
 
 void tncSendPacket (char * s)
