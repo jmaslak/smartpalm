@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * displaysend.c
  *
  * SmartPalm Mobile APRS Display

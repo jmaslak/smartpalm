@@ -1,3 +1,6 @@
+
+$Id$
+
 This is a VERY preliminary version of the manual for
 SmartPalm.  I would love someone to write a more complete manual.
 

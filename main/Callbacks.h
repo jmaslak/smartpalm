@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /* This code is from the O'reilly Palm Programming book */
 
 #ifndef __CALLBACK_H__

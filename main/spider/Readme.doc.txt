@@ -1,3 +1,6 @@
+
+$Id$
+
 Ok, here's what I have.
 I may have missed some details, and of course this whole thing is yet untested, but 
 until I have something to (try to) talk to, this is as good as it gets.

@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * utils.h
  *
  * SmartPalm Mobile APRS Display

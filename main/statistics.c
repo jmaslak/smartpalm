@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * statistics.c
  *
  * SmartPalm Mobile APRS Display

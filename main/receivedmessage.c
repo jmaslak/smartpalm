@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * receivedmessage.c
  *
  * SmartPalm Mobile APRS Display

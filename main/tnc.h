@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * tnc.h
  *
  * SmartPalm Mobile APRS Display

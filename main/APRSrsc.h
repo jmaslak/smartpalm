@@ -1,3 +1,5 @@
+// $Id$
+
 //	Resource: Talt 1100
 #define SerialInUseAlert                        1100
 #define SerialInUseOK                              0

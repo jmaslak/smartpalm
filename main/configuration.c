@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * configuration.c
  *
  * SmartPalm Mobile APRS Display

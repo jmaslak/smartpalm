@@ -3,7 +3,7 @@
 ; File Name		:'OutCOMMS.asm"
 ; Title			:
 ; Date			:
-; Version		:
+; Version		: $Id$
 ; Support telephone	:765 287 1987  David B. VanHorn
 ; Support fax		:765 287 1989
 ; Support Email		:dvanhorn@cedar.net
