@@ -316,7 +316,7 @@ static void handleGPRMC(char * theData, float * lat, float * lon, int * speed, i
 			MemMove(hour,   time+0, 2);
 			MemMove(minute, time+2, 2);
 			MemMove(second, time+4, 2);
-			MemMove(day,    time+0, 2);
+			MemMove(day,    date+0, 2);
 			MemMove(month,  date+2, 2);
 			MemMove(year,   date+4, 2);
 
@@ -372,9 +372,12 @@ void sendBeacon (void)
 //		StrPrintF(packet,
 //			  "/%s%s%sz%s%c/%s%c>%s/%s/%s",
 //			  day, hour, minute, lat, latdir, lon, londir, hd, spd, status);
+//		StrPrintF(packet,
+//			  "@%s%s%sz%s%c/%s%c>%s",
+//			  day, hour, minute, lat, latdir, lon, londir, status);
 		StrPrintF(packet,
-			  "@%s%s%sz%s%c/%s%c>%s",
-			  day, hour, minute, lat, latdir, lon, londir, status);
+			  "=%s%c/%s%c>%s",
+			  lat, latdir, lon, londir, status);
 	}
 
 	tncSendPacket(packet);

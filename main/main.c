@@ -17,6 +17,7 @@
 #include "SmartPalm.h"
 #include "main.h"
 
+#include "aprs.h"
 #include "configuration.h"
 #include "database.h"
 #include "displayconfiguration.h"
@@ -41,6 +42,7 @@ static Boolean StartApplication(void)
 		return false;
 	}
 
+	initStatus();
 	initSummary();
 	initStatistics();
 	initDatabase();
