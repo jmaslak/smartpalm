@@ -9,6 +9,8 @@ OBJS=aprs.o displayconfiguration.o displaysummary.o statistics.o configuration.o
 CRID=APRD
 NAME="APRS Display"
 
+all:	$(APP).prc
+
 $(APP).prc: $(APP) bin.stamp grc.stamp
 	build-prc --creator $(CRID) --type appl --name $(NAME) -o $(APP).prc  *.grc *.bin
 
