@@ -42,4 +42,7 @@
 #define DEFAULT_FAST_BEACON_RATE (180)
 #define DEFAULT_STOP_BEACON_RATE (600)
 
+/* Aren't you glad that PI != 4? */
+#define PI (3.14159265359)
+
 #endif

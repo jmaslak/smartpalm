@@ -7,6 +7,11 @@
  *
  */
 
+#include <PalmOS.h>
+#include <PalmCompatibility.h>
+
+#include <math.h>
+
 #include "SmartPalm.h"
 #include "utils.h"
 
