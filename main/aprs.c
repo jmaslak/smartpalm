@@ -242,7 +242,8 @@ static void handle_message (char * payload, char * data, char * src) {
 		} else if (!StrNCompare(payload+10, "rej", 3)) {
 //			rejMessage(payload+13, src);  // XXX
 		} else if (!StrNCompare(payload+10, "!SYSRESET!", 10)) {
-			tncInit();  /* Respond by re-initializing the TNC */
+			tncInit();
+			tncConfig();
 			sendAck(payload+10, src);
 			sendResetResponse(src);
 		} else {
@@ -257,8 +258,9 @@ static void handle_message (char * payload, char * data, char * src) {
 static void sendResetResponse(char * src) {
 	char packet[79];
 	char formatted_call[20];
-	static int nextresettime = 0;
+	static UInt32 nextresettime = 0;
 	unsigned int i;
+	char message_id[6];
 
 	if (nextresettime < TimGetSeconds()) {
 		nextresettime = TimGetSeconds() + MINACKWAIT;
@@ -270,7 +272,8 @@ static void sendResetResponse(char * src) {
 			formatted_call[i] = ' ';
 		}
 		formatted_call[9] = '\0';
-		StrPrintF(packet, ":%s:SmartPalm Reset Successful!", formatted_call);
+		getNextID(message_id);
+		StrPrintF(packet, ":%s:SmartPalm Reset Successful!{%d", formatted_call, message_id);
 		tncSendPacket(packet);
 	}
 }

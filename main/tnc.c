@@ -87,7 +87,11 @@ static Boolean getSerialCharacter(char * theData, int size, int * current_charac
 
 		numBytesPending--;
 		
-		if (*current_character > 297) { *current_character = 297; }
+		if (*current_character > 297) {
+			*current_character = 297;
+			*(theData + 298) = '\0';
+			complete_packet = 1;
+		}
 		numBytes = SerReceive(gSerialRefNum, theData + *current_character, 1, 0, &err);
 		if (err == serErrLineErr) {
 			SerClearErr(gSerialRefNum);
@@ -110,7 +114,7 @@ static Boolean getSerialCharacter(char * theData, int size, int * current_charac
 
 Boolean processPendingSerialCharacter (unsigned int timeout) {
 	static char theData[300];
-	static int size = 300;
+	static int size = 299;
 	static int current_character = 0;
 	static int seed = 0;
 	
@@ -143,6 +147,8 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
  		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
 		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*,KK7CN-8*,WB7GR-9*,WIDE*:}WB7GR-9>GPSLK,TCPIP,KJ7AZ*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
 		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*:!4117.59NN10535.59W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYSRESET!{30");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYS!{30");
 		
 		updateSummary();
 		return 1;
@@ -164,26 +170,16 @@ void tncSend (char * s)
 
 void tncConfig (void)
 {
-	processPendingSerialCharacter(0);
 	tncSend("MYCALL ");
-	processPendingSerialCharacter(0);
 	tncSend(getCallsign());
-	processPendingSerialCharacter(0);
 	tncSend("\r");
-	processPendingSerialCharacter(0);
 	
 	if (StrLen(getDigipeaterPath()) > 0) {
-		processPendingSerialCharacter(0);
 		tncSend("UNPROTO APZPAD via ");
-		processPendingSerialCharacter(0);
 		tncSend(getDigipeaterPath());
-		processPendingSerialCharacter(0);
 		tncSend("\r");
-		processPendingSerialCharacter(0);
 	} else {
-		processPendingSerialCharacter(0);
 		tncSend("UNPROTO APZPAD\r");
-		processPendingSerialCharacter(0);
 	}
 }
 
@@ -206,20 +202,13 @@ void tncSendPacket (char * s)
 {
 	if (!configuredCallsign()) { return; }
 	
-	processPendingSerialCharacter(0);
 	tncSend("k\r");
-	processPendingSerialCharacter(0);
 	tncSend(s);
-	processPendingSerialCharacter(0);
 	tncSend("\r\3\r\r");
-	processPendingSerialCharacter(0);
-
 
 	updateNetworkHistory();
 	clearDigipeatCount();
 
-	processPendingSerialCharacter(0);
 	SndPlaySystemSound(sndWarning);
-	processPendingSerialCharacter(0);
 }
 
