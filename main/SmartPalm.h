@@ -1,4 +1,6 @@
 /*
+ * $Id$
+ *
  * SmartPalm.h
  *
  * SmartPalm Mobile APRS Display
@@ -49,3 +51,4 @@
 #define PI (3.14159265359)
 
 #endif
+
