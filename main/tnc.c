@@ -221,15 +221,7 @@ void tncSendPacket (char * s)
 	processPendingSerialCharacter(0);
 
 
-	for (i=0; i<8; i++) {
-		network_history[i] = network_history[i+1];
-	}
-	if (digipeat_count > 0) {
-		network_history[8] = 1;
-	} else {
-		network_history[8] = 0;
-	}
-	
+	updateNetworkHistory();
 	digipeat_count = 0;
 
 	processPendingSerialCharacter(0);

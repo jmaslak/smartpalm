@@ -7,8 +7,20 @@
  *
  */
 
+#include <PalmOS.h>
+#include <PalmCompatibility.h>
+
 #include "SmartPalm.h"
 #include "displaysummary.h"
+
+#include "aprs.h"
+#include "APRSrsc.h"
+#include "Callbacks.h"
+#include "configuration.h"
+#include "receivedmessage.h"
+#include "statistics.h"
+#include "tnc.h"
+#include "utils.h"
 
 static void    APRSSummaryInit(void);
 static void    APRSSummaryUpdate(void);
@@ -51,17 +63,14 @@ static void APRSSummaryInit(void)
 
 static void APRSSummaryUpdate(void)
 {
-	int i, j;
+	int j;
 	char s[20];
 	DateTimeType dt;
 	char day[3], month[3], year[5], hour[3], minute[3], second[3];
 
 	// Compute network reliability numbers
 	j = 0;
-	for (i=0; i<9; i++) {
-		if (network_history[i]) { j++; }
-	}
-	StrPrintF(s, "%d  %d", digipeat_count, j);
+	StrPrintF(s, "%d  %d", getDigipeatCount(), getNetworkHistory());
 	if (StrLen(s) > 4) {
 		StrCopy(s, "BAD");
 	}
@@ -94,7 +103,7 @@ static void APRSSummaryUpdate(void)
 	if (StrLen(s) > 8) { StrCopy(s, "BAD DATA"); }
 	SetFieldTextFromStr(APRSSummaryCourseField, s);
 
-	SetFieldTextFromStr(APRSSummaryPathField, conf.digipeater_path);
+	SetFieldTextFromStr(APRSSummaryPathField, getDigipeaterPath());
 
 	if (remote_call[0] != '\0') {
 		SetFieldTextFromStr(APRSSummaryRemoteCallField, remote_call);
@@ -240,10 +249,12 @@ static Boolean APRSSummaryHandleMenuEvent(Word menuID)
 		FrmGotoForm(APRSSendForm);
 		break;
 
-	case APRSSummaryInitTNCItem:
+/*  Diked out by JCM
+        case APRSSummaryInitTNCItem:
 		handled = true;
 		tncInit();
 		break;
+*/
 
 	case APRSSummaryBeaconNowItem:
 		handled = true;
@@ -310,17 +321,17 @@ void setLastHeardPayload(char * data) {
 }
 
 int getMyLatitude(void) {
-	return my_lat;
+	return mylat;
 }
 
 int getMyLongitude(void) {
-	return my_lon;
+	return mylon;
 }
 
 int getMySpeed(void) {
-	return my_speed;
+	return speed;
 }
 
 int getMyHeading(void) {
-	return my_heading;
+	return heading;
 }

@@ -25,6 +25,27 @@ void initStatistics(void) {
 	for (i=0; i<9; i++) { network_history[i] = i % 2; }
 }
 
+unsigned int getNetworkHistory(void) {
+	return network_history;
+}
+
+unsigned int getDigipeatCount(void) {
+	return digipeat_count;
+}
+
+void updateNetworkHistory(void) {
+	int i;
+
+	for (i=0; i<8; i++) {
+		network_history[i] = network_history[i+1];
+	}
+	if (digipeat_count > 0) {
+		network_history[8] = 1;
+	} else {
+		network_history[8] = 0;
+	}
+}
+
 void incrementDigipeatCount(void) {
 	digipeat_count++;
 }

@@ -11,5 +11,6 @@
 #define SP_receivedmessage_H_ 1
 
 extern void storeMessage(char * payload, char * src);
+extern UInt receivedMessageCount(void);
 
 #endif
