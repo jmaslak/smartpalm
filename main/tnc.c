@@ -21,7 +21,6 @@ static UInt    gSerialRefNum;
 static VoidPtr gSerialBuffer = NULL;
 static Boolean getSerialCharacter(char * theData, int size, int * current_character, unsigned int timeout);
 static void    tncSend(char * s);
-static void    tncInit(void);
 static void    tncSendPacket(char * s);
 
 /* Returns true normally, false upon an error */
@@ -182,7 +181,7 @@ void tncConfig (void)
 }
 
 
-static void tncInit (void)
+void tncInit (void)
 {
 	processPendingSerialCharacter(0);
 	tncSend("\3\r\r");

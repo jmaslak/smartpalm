@@ -17,7 +17,11 @@
 #include "SmartPalm.h"
 #include "main.h"
 
+#include "configuration.h"
 #include "database.h"
+#include "displayconfiguration.h"
+#include "displayread.h"
+#include "displaysend.h"
 #include "displaysummary.h"
 #include "statistics.h"
 #include "tnc.h"

@@ -15,7 +15,6 @@
 
 static void    APRSSendInit(void);
 static void    APRSSendUpdate(void);
-static Boolean APRSSendHandleEvent(EventPtr event);
 
 static char    lastack[6];
 
