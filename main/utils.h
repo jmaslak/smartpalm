@@ -5,7 +5,7 @@
  * Copyright (C) 2001 by Joel C. Maslak
  * All Rights Reserved (see license)
  *
- */
+ */ 
 
 #ifndef SP_utils_H_
 #define SP_utils_H_ 1
