@@ -29,6 +29,32 @@ bin.stamp: $(RCPFILE)
 	pilrc $(RCPFILE) 
 	touch bin.stamp
 
-
 clean:
 	-rm -f $(OBJS) $(APP) $(APP).prc *.bin bin.stamp *.grc grc.stamp *\~
+
+depend:
+	makedepend -Y -- $(CFLAGS) -- *.c 2>/dev/null
+# DO NOT DELETE
+
+aprs.o: SmartPalm.h aprs.h configuration.h displaysend.h displaysummary.h
+aprs.o: receivedmessage.h statistics.h tnc.h utils.h
+configuration.o: SmartPalm.h configuration.h database.h
+database.o: SmartPalm.h database.h configuration.h displayconfiguration.h
+displayconfiguration.o: SmartPalm.h displaysummary.h aprs.h APRSrsc.h
+displayconfiguration.o: Callbacks.h configuration.h tnc.h utils.h
+displayread.o: Callbacks.h SmartPalm.h displayread.h aprs.h APRSrsc.h
+displayread.o: database.h receivedmessage.h tnc.h utils.h
+displaysend.o: SmartPalm.h displaysend.h aprs.h APRSrsc.h Callbacks.h
+displaysend.o: configuration.h statistics.h tnc.h utils.h
+displaysummary.o: SmartPalm.h displaysummary.h aprs.h APRSrsc.h Callbacks.h
+displaysummary.o: configuration.h receivedmessage.h statistics.h tnc.h
+displaysummary.o: utils.h
+main.o: Callbacks.h SmartPalm.h main.h aprs.h configuration.h database.h
+main.o: displayconfiguration.h displayread.h displaysend.h displaysummary.h
+main.o: statistics.h tnc.h APRSrsc.h
+receivedmessage.o: Callbacks.h SmartPalm.h receivedmessage.h aprs.h
+receivedmessage.o: database.h statistics.h tnc.h utils.h
+statistics.o: SmartPalm.h statistics.h displaysummary.h
+tnc.o: SmartPalm.h tnc.h aprs.h APRSrsc.h configuration.h displaysummary.h
+tnc.o: statistics.h
+utils.o: SmartPalm.h utils.h
