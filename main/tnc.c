@@ -187,7 +187,7 @@ void tncInit (void)
 {
 	tncSend("\r\3\r\r");
 
-	tncSend("CR OFF\r");
+	tncSend("CR ON\r");
 	tncSend("LOC EVERY 0\r");
 	tncSend("ECHO OFF\r");
 	tncSend("XFLOW OFF\r");
