@@ -16,13 +16,17 @@
 #include "SmartPalm.h"
 #include "displayread.h"
 
+#include "aprs.h"
 #include "APRSrsc.h"
+#include "database.h"
+#include "receivedmessage.h"
+#include "tnc.h"
+#include "utils.h"
 
 static void APRSReadInit(void);
 static void APRSReadUpdate(void);
-static Boolean APRSReadHandleEvent(EventPtr event);
 
-tatic void APRSReadInit(void)
+static void APRSReadInit(void)
 {
 	FormPtr frm = FrmGetActiveForm();
 	FrmDrawForm(frm);
@@ -60,7 +64,7 @@ static void APRSReadUpdate(void)
 	DmCloseDatabase(dbref);
 }
 
-static Boolean APRSReadHandleEvent(EventPtr event)
+Boolean APRSReadHandleEvent(EventPtr event)
 {
 	Boolean	handled;
 	
