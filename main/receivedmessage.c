@@ -14,7 +14,14 @@
 #include "Callbacks.h"
 
 #include "SmartPalm.h"
-#include "received.h"
+#include "receivedmessage.h"
+
+#include "aprs.h"
+#include "database.h"
+#include "statistics.h"
+#include "tnc.h"
+#include "utils.h"
+
 
 static void     addToDatabase(char * call, char * mpart, char * id, Word database);
 static VoidHand inDatabase(char * call, char * mpart, char * id, Word database);
