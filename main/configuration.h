@@ -10,6 +10,18 @@
 #ifndef SP_configuration_H_
 #define SP_configuration_H_ 1
 
+struct ConfigurationInfo {
+	int magic;
+	char digipeater_path[72];
+	char callsign[10];
+	int low_speed;
+	int high_speed;
+	int turn_threshold;
+	int turn_beacon_rate;
+	int fast_beacon_rate;
+	int stop_beacon_rate;
+};
+
 extern void   initconfiguration(void);
 extern void   writeConfiguration(void);
 extern void   readConfiguration (void);

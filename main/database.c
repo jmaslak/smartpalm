@@ -14,6 +14,8 @@
 #include "database.h"
 
 #include "configuration.h"
+#include "displayconfiguration.h"
+
 
 static void createDatabases(void);
 
