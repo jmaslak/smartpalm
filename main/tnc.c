@@ -14,14 +14,17 @@
 #include "SmartPalm.h"
 #include "tnc.h"
 
+#include "aprs.h"
 #include "APRSrsc.h"
+#include "configuration.h"
+#include "displaysummary.h"
+#include "statistics.h"
 
 
 static UInt    gSerialRefNum;
 static VoidPtr gSerialBuffer = NULL;
 static Boolean getSerialCharacter(char * theData, int size, int * current_character, unsigned int timeout);
 static void    tncSend(char * s);
-static void    tncSendPacket(char * s);
 
 /* Returns true normally, false upon an error */
 Boolean initSerial(void) {
@@ -115,7 +118,7 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 	Boolean command_received;
 
 	if (seed == 0) {
-		if (!debug) { seed++; }
+		if (!DEBUG) { seed++; }
 	}
 
 	command_received = getSerialCharacter(theData, size, &current_character, timeout);
@@ -137,7 +140,7 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 		handlePacket("N7XUC>GPS::N7XUC-3  :ABCD{111");
 		handlePacket("N7XUC>GPS::N7XUC-4  :ABCD{111");
 
-		aprs_received = 1;
+		updateSummary();
 		return 1;
 	}
 	return command_received;
@@ -160,16 +163,16 @@ void tncConfig (void)
 	processPendingSerialCharacter(0);
 	tncSend("MYCALL ");
 	processPendingSerialCharacter(0);
-	tncSend(conf.callsign);
+	tncSend(getCallsign());
 	processPendingSerialCharacter(0);
 	tncSend("\r");
 	processPendingSerialCharacter(0);
 	
-	if (StrLen(conf.digipeater_path) > 0) {
+	if (StrLen(getDigipeaterPath()) > 0) {
 		processPendingSerialCharacter(0);
 		tncSend("UNPROTO APZPAD via ");
 		processPendingSerialCharacter(0);
-		tncSend(conf.digipeater_path);
+		tncSend(getDigipeaterPath());
 		processPendingSerialCharacter(0);
 		tncSend("\r");
 		processPendingSerialCharacter(0);
@@ -209,8 +212,6 @@ void tncInit (void)
 
 void tncSendPacket (char * s)
 {
-	int i;
-	
 	processPendingSerialCharacter(0);
 	tncSend("k\r");
 	processPendingSerialCharacter(0);
@@ -221,7 +222,7 @@ void tncSendPacket (char * s)
 
 
 	updateNetworkHistory();
-	digipeat_count = 0;
+	clearDigipeatCount();
 
 	processPendingSerialCharacter(0);
 	SndPlaySystemSound(sndWarning);
