@@ -32,6 +32,9 @@
 #define dbReceived     				   2
 #define dbSent     				   3
 
+/* Never send an ACK more frequently than once ever MINACKWAIT seconds */
+#define MINACKWAIT (30)
+
 /* Defaults to initialize database */
 #define DEFAULT_DIGIPEATER_PATH  ("WIDE")
 #define DEFAULT_CALLSIGN         ("N0CALL")

@@ -80,7 +80,7 @@ void storeMessage(char * payload, char * src) {
 	StrCopy(id, idptr);
 	*(idptr-1) = '\0';
 
-	if ((lastacktime + 7) < TimGetTicks()) {
+	if ((lastacktime + MINACKWAIT) < TimGetSeconds()) {
 		if (*id != '\0') {
 			StrCopy(formatted_call, src);
 			i=0;
@@ -91,7 +91,7 @@ void storeMessage(char * payload, char * src) {
 			formatted_call[9] = '\0';
 			StrPrintF(packet, ":%s:ack%s", formatted_call, id);
 			tncSendPacket(packet);
-			lastacktime = TimGetTicks();
+			lastacktime = TimGetSeconds();
 		}
 	}
 
