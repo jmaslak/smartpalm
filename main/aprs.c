@@ -240,6 +240,8 @@ static void handle_message (char * payload, char * data, char * src) {
 			ackMessage(payload+13, src);  // XXX
 		} else if (!StrNCompare(payload+10, "rej", 3)) {
 //			rejMessage(payload+13, src);  // XXX
+		} else if (!StrNCompare(payload+10, "!SYSRESET!", 10)) {
+			tncInit();  /* Respond by re-initializing the TNC */
 		} else {
 			storeMessage(payload+10, src);
 		}
