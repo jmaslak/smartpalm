@@ -185,7 +185,7 @@ void tncConfig (void)
 
 void tncInit (void)
 {
-	tncSend("\3\r\r");
+	tncSend("\r\3\r\r");
 
 	tncSend("CR OFF\r");
 	tncSend("LOC EVERY 0\r");
@@ -195,7 +195,7 @@ void tncInit (void)
 	tncSend("GPSTEXT $GPRMC\r");
 	tncSend("LTMON 1\r");
 	tncSend("LTMHEAD OFF\r");
-	tncSend("BBSMSGS ON\r");
+	tncSend("BBSMSGS ON\r\r");
 }
 
 void tncSendPacket (char * s)
