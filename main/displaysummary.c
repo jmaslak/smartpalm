@@ -24,7 +24,6 @@
 
 static void    APRSSummaryInit(void);
 static void    APRSSummaryUpdate(void);
-static Boolean APRSSummaryHandleEvent(EventPtr event);
 static Boolean APRSSummaryHandleMenuEvent(Word menuID);
 
 static int    heading;
@@ -51,6 +50,10 @@ void initSummary(void) {
 	remote_data[0] = '\0';
 	mylat = 180;
 	mylon = 0;
+	aprs_received = 1;
+}
+
+void updateSummary(void) {
 	aprs_received = 1;
 }
 
@@ -136,7 +139,7 @@ static void APRSSummaryUpdate(void)
 	}
 }
 
-static Boolean APRSSummaryHandleEvent(EventPtr event)
+Boolean APRSSummaryHandleEvent(EventPtr event)
 {
 	Boolean	handled;
 	char * txt;

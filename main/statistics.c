@@ -7,6 +7,9 @@
  *
  */
 
+#include <PalmOS.h>
+#include <PalmCompatibility.h>
+
 #include "SmartPalm.h"
 #include "statistics.h"
 
@@ -18,6 +21,8 @@ static UInt32 lastid;
 static UInt32 utc;
 
 void initStatistics(void) {
+	int i;
+	
 	digipeat_count = 0;
 	lastid = 0;
 	utc = 0;
@@ -26,7 +31,13 @@ void initStatistics(void) {
 }
 
 unsigned int getNetworkHistory(void) {
-	return network_history;
+	int i, j;
+
+	j = 0;
+
+	for (i=0; i<9; i++) { j += network_history[i]; }
+
+	return j;
 }
 
 unsigned int getDigipeatCount(void) {
@@ -67,7 +78,7 @@ void getNextID(char * id) {
 
 void setUTC(UInt32 tm) {
 	utc = tm;
-	aprs_received = 1;
+	updateSummary();
 }
 
 UInt32 getUTC(void) {
