@@ -13,5 +13,7 @@
 extern Boolean initSerial(void);
 extern void    closeSerial(void);
 extern void    tncSendPacket (char * s);
+extern Boolean processPendingSerialCharacter (unsigned int timeout);
+extern void    tncConfig(void);
 
 #endif

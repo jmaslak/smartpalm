@@ -7,8 +7,18 @@
  *
  */
 
+#include <PalmOS.h>
+#include <PalmCompatibility.h>
+
 #include "SmartPalm.h"
 #include "displaysummary.h"
+
+#include "aprs.h"
+#include "APRSrsc.h"
+#include "Callbacks.h"
+#include "configuration.h"
+#include "tnc.h"
+#include "utils.h"
 
 static void    APRSConfigurationInit(void);
 static void    APRSConfigurationUpdate(void);
