@@ -141,6 +141,8 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 		handlePacket("KD7TA-7>APRS:!4118.75NN10534.78W#PHG2360/kd7ta@arrl.net.");
 		handlePacket("KD7TA-5>GPS:!4118.41N/10533.93W&PHG3160/30m>2M Gate kd7ta@arrl.net.");
  		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*,KK7CN-8*,WB7GR-9*,WIDE*:}WB7GR-9>GPSLK,TCPIP,KJ7AZ*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
 		
 		updateSummary();
 		return 1;

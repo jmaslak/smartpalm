@@ -24,7 +24,7 @@
 
 static void    handleAX25(char * theData);
 static void    parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing,
-			   char * data, char * src);
+			   char * data, char * src, char * digipeaters);
 static void    handle_message (char * payload, char * data, char * src);
 static Boolean localRecipient(char * payload);
 static void    parse_extension (char * extension, int * speed, int * heading, char * data);
@@ -34,6 +34,7 @@ static void    handleGPRMC(char * theData, float * lat, float * lon, int * speed
 static void    updateMySummary (float lat, float lon, int speed, int heading, UInt32 utc);
 static void    updateRemoteSummary (int speed, int heading, int bearing, float distance,
 				    char * call, char * digis, char * payload);
+static void    parseThirdPartyHeader (char * payload, char * src, int * payload_offset, char * digipeaters);
 
 static char    status[37];
 
@@ -93,7 +94,8 @@ static void handleAX25(char * theData) {
 	}
 
 	remote_data[0] = '\0';
-	parse_APRS(payload, &remote_speed, &remote_heading, &remote_distance, &remote_bearing, remote_data, call);
+	parse_APRS(payload, &remote_speed, &remote_heading, &remote_distance, &remote_bearing, remote_data,
+		   call, digipeaters);
 	updateRemoteSummary(remote_speed, remote_heading, remote_bearing, remote_distance, call,
 			    digipeaters, remote_data);
 
@@ -102,9 +104,10 @@ static void handleAX25(char * theData) {
 	}
 }
 
-static void parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing, char * data, char * src) {
+static void parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing, char * data, char * src, char * digipeaters) {
 	float lat, lon;
 	UInt32 seconds;
+	int payload_offset;
 	
 	// Strip out X-1J4
 	if (!StrNCompare(payload, "TheNet X-1J4", 15)) {
@@ -128,6 +131,10 @@ static void parse_APRS (char * payload, int * speed, int * heading, float * dist
 		lon = 0.0;
 		lat = 180.0;
 		handle_message(payload+1, data, src);
+	} else if (payload[0] == '}') {
+		parseThirdPartyHeader(payload+1, src, &payload_offset, digipeaters);
+		parse_APRS(payload + 2 + payload_offset, speed, heading, distance, bearing, data, src, digipeaters);
+		return;  /* End the recursion */
 	} else {
 		*speed = -1;
 		*heading = -1;
@@ -141,6 +148,85 @@ static void parse_APRS (char * payload, int * speed, int * heading, float * dist
 
 	*distance = computeDistance(getMyLatitude(), getMyLongitude(), lat, lon);
 	*bearing  = (int) (computeBearing (getMyLatitude(), getMyLongitude(), lat, lon) + .5);
+}
+
+static void parseThirdPartyHeader (char * payload, char * src, int * payload_offset, char * digipeaters) {
+	char tmpdigis[255];
+	int i = 0;
+	char * digis;
+	char * origdigis;
+	char * origsrc;
+
+	digis = tmpdigis;
+	origdigis = digipeaters;
+	origsrc = src;
+	
+	*payload_offset = 0;
+
+	while (*src != '\0') {
+		*digis = *src;
+		src++;
+		digis++;
+	}
+
+	*(digis++) = '@';
+	*(digis++) = ',';
+	*digis = '\0';
+
+	src = origsrc;
+
+	while ((*payload != '>') && (*payload != '\0')) {
+	        if (i++ < 9) {
+			*src = *payload;
+			*(src+1) = '\0';
+			src++;
+		}
+		payload++;
+		(*payload_offset)++;
+	}
+
+	if (*payload == '\0') { return; }
+
+	payload++;
+	(*payload_offset)++;
+
+	while ((*payload != '>') && (*payload != ',') && (*payload != '\0')) {
+		payload++;
+		(*payload_offset)++;
+	}
+
+	if (*payload == '\0') { return; }
+
+	payload++;
+	(*payload_offset)++;
+	
+	while ((*payload != ':') && (*payload != '\0')) {
+		*digis = *payload;
+		*(digis+1) = '\0';
+		payload++;
+		digis++;
+		(*payload_offset)++;
+	}
+
+	if (*digipeaters != '\0') {
+		*digis = ',';
+		*(digis+1) = '\0';
+		digis++;
+	}
+	
+	while (*digipeaters != '\0') {
+		*digis = *digipeaters;
+		*(digis+1) = '\0';
+		digis++;
+		digipeaters++;
+	}
+
+	digis = tmpdigis;
+
+	while (*digis != '\0') {
+		*(origdigis++) = *(digis++);
+		*origdigis = '\0';
+	}
 }
 
 static void handle_message (char * payload, char * data, char * src) {
