@@ -7,11 +7,19 @@
  *
  */
 
+#include <PalmOS.h>
+#include <PalmCompatibility.h>
+
 #include "SmartPalm.h"
 #include "displaysend.h"
 
+#include "aprs.h"
 #include "APRSrsc.h"
+#include "Callbacks.h"
 #include "configuration.h"
+#include "statistics.h"
+#include "tnc.h"
+#include "utils.h"
 
 static void    APRSSendInit(void);
 static void    APRSSendUpdate(void);
@@ -30,7 +38,7 @@ static void APRSSendUpdate(void)
 {
 }
 
-static Boolean APRSSendHandleEvent(EventPtr event)
+Boolean APRSSendHandleEvent(EventPtr event)
 {
 	static char message_id[6];
 		
