@@ -134,11 +134,14 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 		handlePacket("KK7CN-9>APRS,KK7CN-8*,WIDE3-2:!4109.73NN10446.05W#PHG7000/ Cheyenne Wyoming");
  		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
 		handlePacket("N0XGA>APRSW,KK7CN-8*,WIDE3:@252109z3941.45N/10448.76W_337/002g004t043P000r000e1w");
-		handlePacket("N7XUC>GPS::N7XUC-3  :ABCD");
-		handlePacket("N7XUC>GPS::N7XUC-3  :ABCD{111");
-		handlePacket("N7XUC>GPS::N7XUC-3  :ABCD{111");
-		handlePacket("N7XUC>GPS::N7XUC-4  :ABCD{111");
-
+		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD");
+		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD{111");
+		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD{111");
+		handlePacket("N0CALL>GPS::N7XUC-4  :ABCD{111");
+		handlePacket("KD7TA-7>APRS:!4118.75NN10534.78W#PHG2360/kd7ta@arrl.net.");
+		handlePacket("KD7TA-5>GPS:!4118.41N/10533.93W&PHG3160/30m>2M Gate kd7ta@arrl.net.");
+ 		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
+		
 		updateSummary();
 		return 1;
 	}

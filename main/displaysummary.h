@@ -17,7 +17,7 @@ extern void    setMySpeed(int sp);
 extern void    setMyHeading(int heading);
 extern void    setLastHeardCall(char * call);
 extern void    setLastHeardSpeed(int sp);
-extern void    setLastHeardDistance(int dist);
+extern void    setLastHeardDistance(float dist);
 extern void    setLastHeardBearing(int bear);
 extern void    setLastHeardHeading(int head);
 extern void    setLastHeardDigipeaters(char * digis);

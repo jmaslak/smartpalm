@@ -15,6 +15,9 @@
 #include "SmartPalm.h"
 #include "utils.h"
 
+static float computeCloseDistance (float lat1, float lon1, float lat2, float lon2);
+static float computeCloseBearing (float lat1, float lon1, float lat2, float lon2);
+
 void timeformat (char * d, UInt32 i, int length)
 {
 	int tmp;
@@ -305,8 +308,68 @@ float computeDistance (float lat1, float lon1, float lat2, float lon2) {
 //	if (D > PI) { D = D - PI; }
 
 	distance = (D * 180 / PI) * 60 * 1.1508;
-//	if (distance > 7000) { distance = 0.0; } // Work around "right on top of you" bug
+
+	if (distance < 20) {
+		distance = computeCloseDistance(lat1, lon1, lat2, lon2);
+	}
+
 	return distance;;
+}
+
+static float computeCloseDistance (float lat1, float lon1, float lat2, float lon2) {
+	double avglat          = ((lat2 * 10.0) + (lat1 * 10.0)) / 2.0;
+	double deltalat        = ((lat1 * 10.0) - (lat2 * 10.0));
+	double deltalon        = ((lon1 * 10.0) - (lon2 * 10.0));
+	double longituderadius = 3956.0 * cos((float) avglat);
+	double longitudefactor = (2.0 * PI * longituderadius) / 360;
+	double latitudefactor  = 69.048;
+
+	double x               = longitudefactor * deltalon;
+	double y               = latitudefactor  * deltalat;
+
+	float distance;
+
+	if (x < 0.0) { x = -x; }
+	if (y < 0.0) { y = -y; }
+
+	distance = sqrt((float) ((x*x) + (y*y)));
+
+	return distance / 10.0;
+}
+
+static float computeCloseBearing (float lat1, float lon1, float lat2, float lon2) {
+	double avglat          = (lat2 + lat1) / 2.0;
+	double deltalat        = (lat1 - lat2);
+	double deltalon        = (lon1 - lon2);
+	double longituderadius = 3956.0 * cos((float) avglat);
+	double longitudefactor = (2.0 * PI * longituderadius) / 360;
+	double latitudefactor  = 69.048;
+
+	double x               = longitudefactor * deltalon;
+	double y               = latitudefactor  * deltalat;
+
+	float bearing;
+
+	if (x < 0.0) { x = -x; }
+	if (y < 0.0) { y = -y; }
+
+	bearing = ((atan((float) (y / x)) * 180) / PI) + 0;
+	if ((deltalon > 0.0) && (deltalat >= 0.0)) {
+		bearing = 90.0 + bearing;
+	} else if ((deltalon <= 0.0) && (deltalat > 0.0)) {
+		bearing = 270.0 - bearing;
+	} else if ((deltalon > 0.0) && (deltalat <= 0.0)) {
+		bearing = 270.0 + bearing;
+	} else if ((deltalon <= 0.0) && (deltalat < 0.0)) {
+		bearing = 90.0 - bearing;
+	}
+
+/*	if (x = 0) { return (float) quadrant; } */
+	
+/*	bearing = ((atan((float) (y / x)) * 180) / PI) + (float) (quadrant); */
+/*     	if (bearing >= 90) { bearing = 0; } */
+
+	return bearing;
 }
 
 float computeBearing (float lat1, float lon1, float lat2, float lon2) {
@@ -316,6 +379,7 @@ float computeBearing (float lat1, float lon1, float lat2, float lon2) {
 	float C;  // True bearing to lat2/lon2 from lat1/lon2 (beware of negatives!) -- In RADIANS
 	float D;  // Distance in radians of arc length
 	float bearing;
+	float distance;
 
 	if ((lat1 > 90.0) || (lat2 > 90.0)) { return -100.0; }
 	
@@ -329,6 +393,12 @@ float computeBearing (float lat1, float lon1, float lat2, float lon2) {
 	bearing = (C * 180.0) / PI;
 	if (sin(L) < 0) {
 		bearing = 360 - bearing;
+	}
+
+	distance = (D * 180 / PI) * 60 * 1.1508;
+
+	if (distance < 20) {
+		bearing = computeCloseBearing(lat1, lon1, lat2, lon2);
 	}
 
 	return bearing;

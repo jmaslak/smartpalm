@@ -23,7 +23,7 @@
 
 
 static void    handleAX25(char * theData);
-static void    parse_APRS (char * payload, int * speed, int * heading, int * distance, int * bearing,
+static void    parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing,
 			   char * data, char * src);
 static void    handle_message (char * payload, char * data, char * src);
 static Boolean localRecipient(char * payload);
@@ -32,7 +32,7 @@ static void    parse_location (char * location, float * lat, float * lon);
 static Boolean getAX25Header(char * theData, char * call, char * digipeaters, char * payload);
 static void    handleGPRMC(char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds);
 static void    updateMySummary (float lat, float lon, int speed, int heading, UInt32 utc);
-static void    updateRemoteSummary (int speed, int heading, int bearing, int distance,
+static void    updateRemoteSummary (int speed, int heading, int bearing, float distance,
 				    char * call, char * digis, char * payload);
 
 static char    status[37];
@@ -69,7 +69,7 @@ static void updateMySummary (float lat, float lon, int speed, int heading, UInt3
 	setUTC(utc);
 }
 
-static void updateRemoteSummary (int speed, int heading, int bearing, int distance,
+static void updateRemoteSummary (int speed, int heading, int bearing, float distance,
 				 char * call, char * digis, char * payload) {
 	setLastHeardSpeed(speed);
 	setLastHeardHeading(heading);
@@ -81,16 +81,18 @@ static void updateRemoteSummary (int speed, int heading, int bearing, int distan
 }
 
 static void handleAX25(char * theData) {
-	char payload[512];
-	char call[10];
-	char digipeaters[256];
-	char remote_data[512];
-	int  remote_speed, remote_heading, remote_distance, remote_bearing;
+	char  payload[512];
+	char  call[10];
+	char  digipeaters[256];
+	char  remote_data[512];
+	int   remote_speed, remote_heading, remote_bearing;
+	float remote_distance;
 	
 	if (!getAX25Header(theData, call, digipeaters, payload)) {
 		return;
 	}
 
+	remote_data[0] = '\0';
 	parse_APRS(payload, &remote_speed, &remote_heading, &remote_distance, &remote_bearing, remote_data, call);
 	updateRemoteSummary(remote_speed, remote_heading, remote_bearing, remote_distance, call,
 			    digipeaters, remote_data);
@@ -100,7 +102,7 @@ static void handleAX25(char * theData) {
 	}
 }
 
-static void parse_APRS (char * payload, int * speed, int * heading, int * distance, int * bearing, char * data, char * src) {
+static void parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing, char * data, char * src) {
 	float lat, lon;
 	UInt32 seconds;
 	
@@ -120,7 +122,7 @@ static void parse_APRS (char * payload, int * speed, int * heading, int * distan
 	} else if (payload[0] == ':') {
 		*speed = -1;
 		*heading = -1;
-		*distance = -1;
+		*distance = -1.0;
 		*bearing = -1;
 		seconds = 0;
 		lon = 0.0;
@@ -129,7 +131,7 @@ static void parse_APRS (char * payload, int * speed, int * heading, int * distan
 	} else {
 		*speed = -1;
 		*heading = -1;
-		*distance = -1;
+		*distance = -1.0;
 		*bearing = -1;
 		seconds = 0;
 		lon = 0.0;
@@ -137,7 +139,7 @@ static void parse_APRS (char * payload, int * speed, int * heading, int * distan
 		StrCopy(data, payload);
 	}
 
-	*distance = (int) (computeDistance(getMyLatitude(), getMyLongitude(), lat, lon) + .5);
+	*distance = computeDistance(getMyLatitude(), getMyLongitude(), lat, lon);
 	*bearing  = (int) (computeBearing (getMyLatitude(), getMyLongitude(), lat, lon) + .5);
 }
 

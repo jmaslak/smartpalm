@@ -31,7 +31,7 @@ static int    speed;
 static char   remote_call[10];  // KCxABD-1
 static int    remote_speed;
 static int    remote_heading;
-static int    remote_distance;
+static float  remote_distance;
 static int    remote_bearing;
 static char   remote_digipeaters[256];
 static char   remote_data[512];
@@ -44,7 +44,7 @@ void initSummary(void) {
 	remote_call[0] = '\0';
 	remote_speed = -1;
 	remote_heading = -1;
-	remote_distance = -1;
+	remote_distance = -1.0;
 	remote_bearing = -1.0;
 	remote_digipeaters[0] = '\0';
 	remote_data[0] = '\0';
@@ -119,8 +119,18 @@ static void APRSSummaryUpdate(void)
 		if (StrLen(s) > 10) { StrCopy(s, "BAD DATA"); }
 		SetFieldTextFromStr(APRSSummaryRemoteHeadingField, s);
 
-		if ((remote_distance >= 0) && (remote_bearing >= 0)) {
-			StrPrintF(s, "%d Mi %s", remote_distance, nameDirection((float) remote_bearing));
+		if ((remote_distance >= 10.0) && (remote_bearing >= 0.0)) {
+			StrPrintF(s, "%d Mi %s", (int) (remote_distance + .5), nameDirection((float) remote_bearing));
+		} else if ((remote_distance >= 0.0) && (remote_bearing >= 0.0)) {
+			int tens, hundreds;
+			
+			tens = (int) (remote_distance * 10.0);
+			tens = tens % 10;
+			hundreds = (int) (remote_distance * 100.0);
+			hundreds = hundreds % 10;
+		
+			StrPrintF(s, "%d.%d%d Mi %s", (int) remote_distance,
+				  tens, hundreds, nameDirection((float) remote_bearing));
 		} else {
 			StrCopy(s, "NO GPS");
 		}
@@ -298,7 +308,7 @@ void setLastHeardSpeed(int sp) {
 	aprs_received = 1;
 }
 
-void setLastHeardDistance(int dist) {
+void setLastHeardDistance(float dist) {
 	remote_distance = dist;
 	aprs_received = 1;
 }
