@@ -1,0 +1,27 @@
+
+$Id$
+
+Compiling SmartPalm from Sources on a Linux box.
+
+
+Using instructions from:
+    http://prc-tools.sourceforge.net/install/
+    http://prc-tools.sourceforge.net/install/rpm.html
+
+I did this: 
+
+As root:
+--------
+Install prc-tools-2.3-1.i386.rpm
+Install palmos-sdk-4.0-1.noarch.rpm (from sdk40.tar.gz)
+Install pilrc-3.2-1.i386.rpm
+Run "palmdev-prep" 
+
+As a normal user:
+-----------------
+cd SmartPalm/main
+make
+
+The last resulted in a file called "SmartPalm.prc" being created.
+This is the compiled executable.
+
