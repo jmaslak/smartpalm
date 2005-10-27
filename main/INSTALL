@@ -15,6 +15,12 @@ As root:
 Install prc-tools-2.3-1.i386.rpm
 Install palmos-sdk-4.0-1.noarch.rpm (from sdk40.tar.gz)
 Install pilrc-3.2-1.i386.rpm
+Install pose-3.5-2.i386.rpm
+Install pose-perl-3.5-2.i386.rpm
+Install pose-skins-handspring-3.1H4-1.noarch.rpm
+Install pose-skins-1.9-1.noarch.rpm
+Download/Unzip PalmOS412_DbgROMs.zip (must register to get this)
+Download/Unzip PalmOS412_RelROMs.zip (must register to get this)
 Run "palmdev-prep" 
 
 As a normal user:
@@ -23,5 +29,16 @@ cd SmartPalm/main
 make
 
 The last resulted in a file called "SmartPalm.prc" being created.
-This is the compiled executable.
+This is the compiled executable for SmartPalm.
+
+Start the emulator by typing "pose &".
+
+Right-click on the window that comes up, select "New".  Select a ROM
+file, Device, Skin, and RAM size.  A Palm device picture will come
+up.
+
+Select Install Application/Database and install SmartPalm.prc
+
+Once that completes you can start "APRS" in the pose emulator just
+as if you were running it on a real PalmOS device.
 
