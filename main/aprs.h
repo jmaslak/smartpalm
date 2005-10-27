@@ -4,7 +4,7 @@
  * aprs.h
  *
  * SmartPalm Mobile APRS Display
- * Copyright (C) 2001 by Joel C. Maslak
+ * Copyright (C) 2001-2005 by Joel C. Maslak
  * All Rights Reserved (see license)
  *
  */
