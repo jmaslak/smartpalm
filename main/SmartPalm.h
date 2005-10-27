@@ -38,7 +38,7 @@
 #define MINACKWAIT (30l)
 
 /* Defaults to initialize database */
-#define DEFAULT_DIGIPEATER_PATH  ("WIDE")
+#define DEFAULT_DIGIPEATER_PATH  ("WIDE1-1,WIDE2-1")
 #define DEFAULT_CALLSIGN         ("N0CALL")
 #define DEFAULT_LOW_SPEED        (7)
 #define DEFAULT_HIGH_SPEED       (55)

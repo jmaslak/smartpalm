@@ -20,7 +20,7 @@ The "main" screen you see in SmartPalm is the "APRS Summary" screen.
 Here's an example screen:
 
 2 8            20@129
-RELAY,WIDE2-2
+WIDE1-1,WIDE2-1
 KK7CN-9
 55@92       43 Mi ESE
 KK7CN-8*,WIDE3-2
@@ -35,7 +35,7 @@ the network quality was 8 - all but one was digipeated.  The GPS is
 reporting that the SmartPalm is traveling at 20 MPH, with a heading 129
 degrees.
 
-The next line, "RELAY,WIDE2-2", is our outgoing path.
+The next line, "WIDE1-1,WIDE2-1", is our outgoing path.
 
 The third line is the source call sign of the last packet received.
 
