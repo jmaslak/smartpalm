@@ -12,15 +12,16 @@ I did this:
 
 As root:
 --------
-Install prc-tools-2.3-1.i386.rpm
-Install palmos-sdk-4.0-1.noarch.rpm (from sdk40.tar.gz)
-Install pilrc-3.2-1.i386.rpm
-Install pose-3.5-2.i386.rpm
-Install pose-perl-3.5-2.i386.rpm
-Install pose-skins-handspring-3.1H4-1.noarch.rpm
-Install pose-skins-1.9-1.noarch.rpm
-Download/Unzip PalmOS412_DbgROMs.zip (must register to get this)
-Download/Unzip PalmOS412_RelROMs.zip (must register to get this)
+Install prc-tools-2.3-1.i386.rpm (or newer)
+Install palmos-sdk-4.0-1.noarch.rpm (from sdk40.tar.gz) (or newer)
+Install pilrc-3.2-1.i386.rpm (or newer)
+Install pilrcui-3.2-1.i386.rpm (or newer)
+Install pose-3.5-2.i386.rpm (or newer)
+Install pose-perl-3.5-2.i386.rpm (or newer)
+Install pose-skins-handspring-3.1H4-1.noarch.rpm (or newer)
+Install pose-skins-1.9-1.noarch.rpm (or newer)
+Download/Unzip PalmOS412_DbgROMs.zip (must register to get this) (or newer)
+Download/Unzip PalmOS412_RelROMs.zip (must register to get this) (or newer)
 Run "palmdev-prep" 
 
 As a normal user:
