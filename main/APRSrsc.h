@@ -52,6 +52,11 @@
 #define APRSConfigurationCancelButton		1011
 #define APRSConfigurationApplyButton		1012
 
+// Resource tFRM 1005
+#define APRSTncConfigurationForm			1005
+#define APRSTncConfigurationCancelButton	1006
+#define APRSTncConfigurationApplyButton		1007
+
 //	Resource tFRM 1003
 #define APRSReadForm				1003
 #define APRSReadCallField			1004
@@ -72,3 +77,6 @@
 #define APRSSummaryPreferencesItem		2001
 #define APRSSummaryBeaconNowItem		2002
 #define APRSSummarySendMessageItem		2003
+#define APRSSummaryTncConfigItem        2004
+
+

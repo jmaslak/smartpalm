@@ -14,5 +14,6 @@
 
 extern void    initConfiguration(void);
 extern Boolean APRSConfigurationHandleEvent(EventPtr event);
+extern Boolean APRSTncConfigurationHandleEvent(EventPtr event);
 
 #endif

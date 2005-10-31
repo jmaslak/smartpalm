@@ -28,6 +28,9 @@ static char *  checkAPRSConfiguration(void);
 static void    saveAPRSConfiguration(void);
 
 
+
+
+
 static void APRSConfigurationInit(void)
 {
 	FormPtr frm = FrmGetActiveForm();
@@ -35,9 +38,14 @@ static void APRSConfigurationInit(void)
 	APRSConfigurationUpdate();
 }
 
+
+
+
+
 static void APRSConfigurationUpdate(void)
 {
 	char buffer[255];
+
 
 	SetFieldTextFromStr(APRSConfigurationPathField, getDigipeaterPath());
 	SetFieldTextFromStr(APRSConfigurationCallField, getCallsign());
@@ -50,11 +58,16 @@ static void APRSConfigurationUpdate(void)
 	SetFieldTextFromStr(APRSConfigurationStopBeaconField,    StrIToA(buffer, getStopBeaconRate()));
 }
 
+
+
+
+
 Boolean APRSConfigurationHandleEvent(EventPtr event)
 {
 	Boolean	handled;
 	char * error;
-	
+
+
 	CALLBACK_PROLOGUE;
 
 	handled = false;
@@ -96,6 +109,10 @@ Boolean APRSConfigurationHandleEvent(EventPtr event)
 	return(handled);
 }
 
+
+
+
+
 static char * checkAPRSConfiguration(void)
 {
 	if (!validPathField(GetFieldText(APRSConfigurationPathField))) {
@@ -133,6 +150,10 @@ static char * checkAPRSConfiguration(void)
 	return NULL;
 }
 
+
+
+
+
 static void saveAPRSConfiguration(void)
 {
 	setDigipeaterPath(GetFieldText(APRSConfigurationPathField));
@@ -145,4 +166,67 @@ static void saveAPRSConfiguration(void)
 	setFastBeaconRate(StrAToI(GetFieldText(APRSConfigurationFastBeaconField)));
 	setStopBeaconRate(StrAToI(GetFieldText(APRSConfigurationStopBeaconField)));
 }
+
+
+
+
+
+static void APRSTncConfigurationInit(void)
+{
+	FormPtr frm = FrmGetActiveForm();
+	FrmDrawForm(frm);
+//	APRSConfigurationUpdate();
+}
+
+
+
+
+
+Boolean APRSTncConfigurationHandleEvent(EventPtr event)
+{
+	Boolean	handled;
+//	char * error;
+
+	
+	CALLBACK_PROLOGUE;
+
+	handled = false;
+	switch (event->eType)
+	{
+	case frmOpenEvent:
+		APRSTncConfigurationInit();
+		handled = true;
+		break;
+
+	case nilEvent:
+		handled = true;
+		EvtResetAutoOffTimer();
+		processPendingSerialCharacter(0);
+		smartBeacon();
+		break;
+
+	case ctlSelectEvent:
+		if (event->data.ctlSelect.controlID == APRSTncConfigurationApplyButton) {
+//			if((error = checkAPRSConfiguration()) == NULL) {
+//				saveAPRSConfiguration();
+//				tncConfig();
+//				APRSConfigurationUpdate();
+				FrmGotoForm(APRSSummaryForm);
+//			} else {
+//				FrmCustomAlert(APRSConfigurationErrorAlert, error, NULL, NULL);
+//			}
+		} else if (event->data.ctlSelect.controlID == APRSTncConfigurationCancelButton) {
+			FrmGotoForm(APRSSummaryForm);
+		}
+
+	default:
+		// Do nothing
+		break;
+	}
+	
+	CALLBACK_EPILOGUE;
+
+	return(handled);
+}
+
 

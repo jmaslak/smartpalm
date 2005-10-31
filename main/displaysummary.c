@@ -24,6 +24,7 @@
 #include "tnc.h"
 #include "utils.h"
 
+
 static void    APRSSummaryInit(void);
 static void    APRSSummaryUpdate(void);
 static Boolean APRSSummaryHandleMenuEvent(Word menuID);
@@ -40,6 +41,10 @@ static char   remote_data[512];
 static float  mylat, mylon;
 static int    aprs_received = 0;
 
+
+
+
+
 void initSummary(void) {
 	heading = -1;
 	speed = -1;
@@ -55,9 +60,17 @@ void initSummary(void) {
 	aprs_received = 1;
 }
 
+
+
+
+
 void updateSummary(void) {
 	aprs_received = 1;
 }
+
+
+
+
 
 static void APRSSummaryInit(void)
 {
@@ -65,6 +78,10 @@ static void APRSSummaryInit(void)
 	FrmDrawForm(frm);
 	APRSSummaryUpdate();
 }
+
+
+
+
 
 static void APRSSummaryUpdate(void)
 {
@@ -150,6 +167,10 @@ static void APRSSummaryUpdate(void)
 		SetFieldTextFromStr(APRSSummaryRemoteDataField, remote_data);
 	}
 }
+
+
+
+
 
 Boolean APRSSummaryHandleEvent(EventPtr event)
 {
@@ -249,104 +270,175 @@ Boolean APRSSummaryHandleEvent(EventPtr event)
 	return(handled);
 }
 
+
+
+
+
 static Boolean APRSSummaryHandleMenuEvent(Word menuID)
 {
 	Boolean handled = false;
 
 	switch (menuID) {
-	case APRSSummaryPreferencesItem:
-		handled = true;
-		FrmGotoForm(APRSConfigurationForm);
-		break;
+    	case APRSSummaryPreferencesItem:
+    		handled = true;
+    		FrmGotoForm(APRSConfigurationForm);
+    		break;
 
-	case APRSSummarySendMessageItem:
-		handled = true;
-		FrmGotoForm(APRSSendForm);
-		break;
+        case APRSSummaryTncConfigItem:
+            handled = true;
+            FrmGotoForm(APRSTncConfigurationForm);
+            break;
+
+    	case APRSSummarySendMessageItem:
+    		handled = true;
+    		FrmGotoForm(APRSSendForm);
+    		break;
 
 /*  Diked out by JCM
-        case APRSSummaryInitTNCItem:
-		handled = true;
-		tncInit();
-		break;
+            case APRSSummaryInitTNCItem:
+    		handled = true;
+    		tncInit();
+    		break;
 */
 
-	case APRSSummaryBeaconNowItem:
-		handled = true;
-		sendBeacon();
-		break;
+    	case APRSSummaryBeaconNowItem:
+    		handled = true;
+    		sendBeacon();
+    		break;
 	}
 
 	return (handled);
 }
+
+
+
+
 
 void setMyLatitude(float lat) {
 	mylat = lat;
 	aprs_received = 1;
 }
 
+
+
+
+
 void setMyLongitude(float lon) {
 	mylon = lon;
 	aprs_received = 1;
 }
+
+
+
+
 
 void setMySpeed(int sp) {
 	speed = sp;
 	aprs_received = 1;
 }
 
+
+
+
+
 void setMyHeading(int head) {
 	heading = head;
 	aprs_received = 1;
 }
+
+
+
+
 
 void setLastHeardCall(char * call) {
 	StrCopy(remote_call, call);
 	aprs_received = 1;
 }
 
+
+
+
+
 void setLastHeardSpeed(int sp) {
 	remote_speed = sp;
 	aprs_received = 1;
 }
+
+
+
+
 
 void setLastHeardDistance(float dist) {
 	remote_distance = dist;
 	aprs_received = 1;
 }
 
+
+
+
+
 void setLastHeardBearing(int bear) {
 	remote_bearing = bear;
 	aprs_received = 1;
 }
+
+
+
+
 
 void setLastHeardHeading(int head) {
 	remote_heading = head;
 	aprs_received = 1;
 }
 
+
+
+
+
 void setLastHeardDigipeaters(char * digis) {
 	StrCopy(remote_digipeaters, digis);
 	aprs_received = 1;
 }
+
+
+
+
 
 void setLastHeardPayload(char * data) {
 	StrCopy(remote_data, data);
 	aprs_received = 1;
 }
 
+
+
+
+
 float getMyLatitude(void) {
 	return mylat;
 }
+
+
+
+
 
 float getMyLongitude(void) {
 	return mylon;
 }
 
+
+
+
+
 int getMySpeed(void) {
 	return speed;
 }
 
+
+
+
+
 int getMyHeading(void) {
 	return heading;
 }
+
+

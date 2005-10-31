@@ -1,5 +1,7 @@
 #include "APRSrsc.h"
 
+
+
 FORM ID APRSReadForm AT (0 0 160 160)
 BEGIN
 	TITLE "Read Message"
@@ -9,6 +11,8 @@ BEGIN
 
 	BUTTON "OK" ID APRSReadOKButton AT (62 140 35 16)
 END
+
+
 
 FORM ID APRSSummaryForm AT (0 0 160 160) MENUID APRSSummaryMenu
 BEGIN
@@ -28,16 +32,32 @@ BEGIN
 	FIELD ID APRSSummaryTimeField AT (4 149 151 11) NONEDITABLE MAXCHARS 25 SINGLELINE FONT 2
 END
 
+
+
 MENU ID APRSSummaryMenu
 BEGIN
 	PULLDOWN "Action"
 	BEGIN
 		MENUITEM "Preferences" ID APRSSummaryPreferencesItem
+        MENUITEM "TNC Config" ID APRSSummaryTncConfigItem
 		MENUITEM "Beacon Now!" ID APRSSummaryBeaconNowItem
 		MENUITEM "Send Message" ID APRSSummarySendMessageItem
 /*		MENUITEM "Initialize TNC" ID APRSSummaryInitTNCItem */
 	END
 END
+
+
+
+FORM ID APRSTncConfigurationForm AT (0 0 160 160)
+BEGIN
+	TITLE "TNC Configuration"
+    CHECKBOX "Enable KISS Mode" AUTOID AT (4 14 151 24) FONT 1
+	BUTTON "OK" ID APRSTncConfigurationApplyButton AT (40 140 35 16)
+	BUTTON "Cancel" ID APRSTncConfigurationCancelButton AT (90 140 35 16)
+    GRAFFITISTATEINDICATOR AT (100 100)
+END
+
+
 
 FORM ID APRSConfigurationForm AT (0 0 160 160)
 BEGIN
@@ -63,6 +83,8 @@ BEGIN
     GRAFFITISTATEINDICATOR AT (100 100)
 END
 
+
+
 FORM ID APRSSendForm AT (0 0 160 160)
 BEGIN
 	TITLE "Send Message"
@@ -78,6 +100,8 @@ BEGIN
     GRAFFITISTATEINDICATOR AT (100 100)
 END
 
+
+
 ALERT ID SerialInUseAlert
 ERROR
 BEGIN
@@ -85,6 +109,8 @@ BEGIN
     MESSAGE "The serial port is in use."
     BUTTONS "OK"
 END
+
+
 
 ALERT ID CantopenserialAlert
 ERROR
@@ -94,6 +120,8 @@ BEGIN
     BUTTONS "OK"
 END
 
+
+
 ALERT ID APRSRemotePathInfoAlert
 INFORMATION
 BEGIN
@@ -101,6 +129,8 @@ TITLE "Remote APRS Path"
 MESSAGE "^1"
 BUTTONS "OK"
 END
+
+
 
 ALERT ID APRSCurrentPathInfoAlert
 INFORMATION
@@ -110,6 +140,8 @@ MESSAGE "^1"
 BUTTONS "OK"
 END
 
+
+
 ALERT ID APRSRemoteDataInfoAlert
 INFORMATION
 BEGIN
@@ -117,6 +149,8 @@ TITLE "Remote APRS Data"
 MESSAGE "^1"
 BUTTONS "OK"
 END
+
+
 
 ALERT ID APRSConfigurationErrorAlert
 ERROR
@@ -126,8 +160,13 @@ MESSAGE "^1"
 BUTTONS "OK"
 END
 
+
+
 STRING ID NoGPSString "No GPS!  "
+
+
 
 VERSION ID 1000 "1.0"
 
 APPLICATIONICONNAME ID 1000 "SmartPalm"
+

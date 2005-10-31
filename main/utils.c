@@ -12,10 +12,17 @@
 #include <PalmOS.h>
 #include <PalmCompatibility.h>
 
-#include <math.h>
+//#include <math.h>
+extern double sin(double);
+extern double cos(double);
+extern double sqrt(double);
+extern float acos(float);
+extern float atan(float);
+
 
 #include "SmartPalm.h"
 #include "utils.h"
+
 
 static float computeCloseDistance (float lat1, float lon1, float lat2, float lon2);
 static float computeCloseBearing (float lat1, float lon1, float lat2, float lon2);
@@ -334,7 +341,7 @@ static float computeCloseDistance (float lat1, float lon1, float lat2, float lon
 	if (x < 0.0) { x = -x; }
 	if (y < 0.0) { y = -y; }
 
-	distance = sqrt((float) ((x*x) + (y*y)));
+	distance = sqrt( (float)( (x*x) + (y*y) ) );
 
 	return distance;
 }

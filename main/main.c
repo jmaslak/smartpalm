@@ -37,6 +37,10 @@ static void    StopApplication(void);
 static Boolean ApplicationHandleEvent(EventPtr event);
 static void    EventLoop(void);
 
+
+
+
+
 /* Returns true on success, false on failure */
 static Boolean StartApplication(void)
 { 
@@ -55,10 +59,18 @@ static Boolean StartApplication(void)
 	return false;
 }
 
+
+
+
+
 static void StopApplication(void)
 {
 	closeSerial();
 }
+
+
+
+
 
 static Boolean ApplicationHandleEvent(EventPtr event)
 {
@@ -75,21 +87,25 @@ static Boolean ApplicationHandleEvent(EventPtr event)
 		// Set the event handler for the form.  The handler of the currently 
 		// active form is called by FrmDispatchEvent each time it receives an event.
 		switch (formId) {
-		case APRSSummaryForm:
-			FrmSetEventHandler(frm, APRSSummaryHandleEvent);
-			break;
+    		case APRSSummaryForm:
+    			FrmSetEventHandler(frm, APRSSummaryHandleEvent);
+    			break;
 
-		case APRSReadForm:
-			FrmSetEventHandler(frm, APRSReadHandleEvent);
-			break;
+    		case APRSReadForm:
+    			FrmSetEventHandler(frm, APRSReadHandleEvent);
+    			break;
 
-		case APRSSendForm:
-			FrmSetEventHandler(frm, APRSSendHandleEvent);
-			break;
+    		case APRSSendForm:
+    			FrmSetEventHandler(frm, APRSSendHandleEvent);
+    			break;
 			
-		case APRSConfigurationForm:
-			FrmSetEventHandler(frm, APRSConfigurationHandleEvent);
-			break;
+    		case APRSConfigurationForm:
+    			FrmSetEventHandler(frm, APRSConfigurationHandleEvent);
+    			break;
+
+    		case APRSTncConfigurationForm:
+    			FrmSetEventHandler(frm, APRSTncConfigurationHandleEvent);
+    			break;
 		}
 		
 		handled = true;
@@ -97,6 +113,10 @@ static Boolean ApplicationHandleEvent(EventPtr event)
 	
 	return handled;
 }
+
+
+
+
 
 static void EventLoop(void)
 {
@@ -113,6 +133,9 @@ static void EventLoop(void)
 		}
 	while (event.eType != appStopEvent);
 }
+
+
+
 
 
 DWord PilotMain(Word cmd, Ptr cmdPBP, Word launchFlags)
