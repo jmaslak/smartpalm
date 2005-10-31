@@ -14,6 +14,8 @@
 #include <SerialMgrOld.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 #include "SmartPalm.h"
 #include "tnc.h"
@@ -387,7 +389,9 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 	Boolean command_received;
 
 	if (seed == 0) {
-		if (!DEBUG) { seed++; }
+#ifdef DEBUG
+        seed++;
+#endif  // DEBUG
 	}
 
 	command_received = getSerialCharacter(theData, size, &current_character, timeout);
@@ -410,6 +414,15 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 	}
 	if (seed == 0) {
 		seed++;
+
+// Must comment out most of these strings else we get: "region
+// coderes is full (SmartPalm section .text)" from the compiler.
+
+#ifdef DEBUG
+//
+// Must comment out some of these strings else we get: "region
+// coderes is full (SmartPalm section .text)" while compiling.
+//
 		handlePacket("$GPRMC,211042.999,A,4118.3969,N,10534.5610,W,0.05,128.74,251100,,*1E");
 		handlePacket("N0KIC>APS199,KK7CN-8,WIDE3*:=3851.85N/10447.76W-APRS+SA    John Colo Sprgs   jwc");
 		handlePacket("KK7CN-9>APRS,KK7CN-8*,WIDE3-2:!4109.73NN10446.05W#PHG7000/ Cheyenne Wyoming");
@@ -419,13 +432,14 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD{111");
 		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD{111");
 		handlePacket("N0CALL>GPS::N7XUC-4  :ABCD{111");
-		handlePacket("KD7TA-7>APRS:!4118.75NN10534.78W#PHG2360/kd7ta@arrl.net.");
-		handlePacket("KD7TA-5>GPS:!4118.41N/10533.93W&PHG3160/30m>2M Gate kd7ta@arrl.net.");
- 		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
-		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*,KK7CN-8*,WB7GR-9*,WIDE*:}WB7GR-9>GPSLK,TCPIP,KJ7AZ*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
-		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*:!4117.59NN10535.59W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
-		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYSRESET!{30");
-		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYS!{30");
+//		handlePacket("KD7TA-7>APRS:!4118.75NN10534.78W#PHG2360/kd7ta@arrl.net.");
+//		handlePacket("KD7TA-5>GPS:!4118.41N/10533.93W&PHG3160/30m>2M Gate kd7ta@arrl.net.");
+// 		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
+//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*,KK7CN-8*,WB7GR-9*,WIDE*:}WB7GR-9>GPSLK,TCPIP,KJ7AZ*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
+//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*:!4117.59NN10535.59W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
+//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYSRESET!{30");
+//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYS!{30");
+#endif  // DEBUG
 		
 		updateSummary();
 		return 1;
@@ -503,6 +517,229 @@ void tncSendPacket (char * s)
 	clearDigipeatCount();
 
 	SndPlaySystemSound(sndWarning);
+}
+
+
+
+
+
+// This function was originally written for the GPL'ed Xastir
+// project by Curt Mills, WE7U.  The code for this function is
+// hereby released under the SmartPalm BSD-style license.
+//
+// This routine changes callsign chars to proper uppercase chars or
+// numerals, fixes the callsign to six bytes, shifts the letters
+// left by
+// one bit, and puts the SSID number into the proper bits in the
+// seventh
+// byte.  The callsign as processed is ready for inclusion in an
+// AX.25 header.
+//
+void fix_up_callsign(unsigned char *data, int data_size) {
+    unsigned char new_call[8] = "       ";  // Start with seven spaces
+    int ssid = 0;
+    int i;
+    int j = 0;
+    int digipeated_flag = 0;
+
+
+    // Check whether we've digipeated through this callsign yet.
+    if (strstr((const char *)data,"*") != 0) {
+         digipeated_flag++;
+    }
+
+    // Change callsign to upper-case and pad out to six places with
+    // space characters.
+    for (i = 0; i < (int)strlen((const char *)data); i++) {
+        toupper(data[i]);
+
+        if (data[i] == '-') {   // Stop at '-'
+            break;
+        }
+        else if (data[i] == '*') {
+        }
+        else {
+            new_call[j++] = data[i];
+        }
+    }
+    new_call[7] = '\0';
+
+    //fprintf(stderr,"new_call:(%s)\n",new_call);
+
+    // Handle SSID.  'i' should now be pointing at a dash or at the
+    // terminating zero character.
+    if ( (i < (int)strlen((const char *)data)) && (data[i++] == '-')) {   // We might have an SSID
+        if (data[i] != '\0')
+            ssid = atoi((const char *)&data[i]);
+//            ssid = data[i++] - 0x30;    // Convert from ascii to
+//            int
+//        if (data[i] != '\0')
+//            ssid = (ssid * 10) + (data[i] - 0x30);
+    }
+
+//fprintf(stderr,"SSID:%d\t",ssid);
+
+    if (ssid >= 0 && ssid <= 15) {
+        new_call[6] = ssid | 0x30;  // Set 2 reserved bits
+    }
+    else {  // Whacko SSID.  Set it to zero
+        new_call[6] = 0x30;     // Set 2 reserved bits
+    }
+
+    if (digipeated_flag) {
+        new_call[6] = new_call[6] | 0x40; // Set the 'H' bit
+    }
+
+    // Shift each byte one bit to the left
+    for (i = 0; i < 7; i++) {
+        new_call[i] = new_call[i] << 1;
+        new_call[i] = new_call[i] & 0xfe;
+    }
+
+//fprintf(stderr,"Last:%0x\n",new_call[6]);
+
+    // Write over the top of the input string with the newly
+    // formatted callsign
+//    snprintf((char *)data, data_size, "%s", new_call);
+    sprintf((char *)data, "%s", new_call);
+}
+
+
+
+
+
+// This function was originally written for the GPL'ed Xastir
+// project by Curt Mills, WE7U.  The code for this function is
+// hereby released under the SmartPalm BSD-style license.
+//
+// Create an AX25 frame and turn it into a KISS packet.  Dump it
+// into the transmit queue.
+//
+void send_ax25_frame(int port, char *source, char *destination, char *path, char *data) {
+    unsigned char temp_source[15];
+    unsigned char temp_dest[15];
+    unsigned char temp[15];
+    unsigned char control[2], pid[2];
+    unsigned char transmit_txt[MAX_LINE_SIZE*2];
+    unsigned char transmit_txt2[MAX_LINE_SIZE*2];
+    unsigned char c;
+    int i, j;
+
+//fprintf(stderr,"KISS
+//String:%s>%s,%s:%s\n",source,destination,path,data);
+
+    transmit_txt[0] = '\0';
+
+    // Format the destination callsign
+//    snprintf((char *)temp_dest, sizeof(temp_dest), "%s", destination);
+    sprintf((char *)temp_dest, "%s", destination);
+ 
+    fix_up_callsign(temp_dest, sizeof(temp_dest));
+//    snprintf((char *)transmit_txt, sizeof(transmit_txt), "%s", temp_dest);
+    sprintf((char *)transmit_txt, "%s", temp_dest);
+
+
+
+    // Format the source callsign
+//    snprintf((char *)temp_source, sizeof(temp_source), "%s", source);
+    sprintf((char *)temp_source, "%s", source);
+ 
+    fix_up_callsign(temp_source, sizeof(temp_source));
+    strncat((char *)transmit_txt,
+        (char *)temp_source,
+        sizeof(transmit_txt) - strlen((char *)transmit_txt));
+
+    // Break up the path into individual callsigns and send them one
+    // by one to fix_up_callsign()
+    j = 0;
+    if ( (path != NULL) && (strlen(path) != 0) ) {
+        while (path[j] != '\0') {
+            i = 0;
+            while ( (path[j] != ',') && (path[j] != '\0') ) {
+                temp[i++] = path[j++];
+            }
+            temp[i] = '\0';
+
+            if (path[j] == ',') {   // Skip over comma
+                j++;
+            }
+
+            fix_up_callsign(temp, sizeof(temp));
+            strncat((char *)transmit_txt,
+                (char *)temp,
+                sizeof(transmit_txt) - strlen((char *)transmit_txt));
+        }
+    }
+
+    // Set the end-of-address bit on the last callsign in the
+    // address field
+    transmit_txt[strlen((const char *)transmit_txt) - 1] |= 0x01;
+
+    // Add the Control byte
+    control[0] = 0x03;
+    control[1] = '\0';
+    strncat((char *)transmit_txt,
+        (char *)control,
+        sizeof(transmit_txt) - strlen((char *)transmit_txt));
+
+    // Add the PID byte
+    pid[0] = 0xf0;
+    pid[1] = '\0';
+    strncat((char *)transmit_txt,
+        (char *)pid,
+        sizeof(transmit_txt) - strlen((char *)transmit_txt));
+
+    // Append the information chars
+    strncat((char *)transmit_txt,
+        data,
+        sizeof(transmit_txt) - strlen((char *)transmit_txt));
+
+    // Add the KISS framing characters and do the proper escapes.
+    j = 0;
+    transmit_txt2[j++] = KISS_FEND;
+
+    // Note:  This byte is where different interfaces would be
+    // specified:
+    transmit_txt2[j++] = 0x00;
+
+    for (i = 0; i < (int)strlen((const char *)transmit_txt); i++) {
+        c = transmit_txt[i];
+        if (c == KISS_FEND) {
+            transmit_txt2[j++] = KISS_FESC;
+            transmit_txt2[j++] = KISS_TFEND;
+        }
+        else if (c == KISS_FESC) {
+            transmit_txt2[j++] = KISS_FESC;
+            transmit_txt2[j++] = KISS_TFESC;
+        }
+        else {
+            transmit_txt2[j++] = c;
+        }
+    }
+    transmit_txt2[j++] = KISS_FEND;
+
+    // Terminate the string, but don't increment the 'j' counter.
+    // We don't want to send the NULL byte out the KISS interface,
+    // just make sure the string is terminated in all cases.
+    //
+    transmit_txt2[j] = '\0';
+
+
+// Transmit data.  The normal method would be to call tncSend(s).
+// That won't work in this case as we need to be able to send 0x00
+// characters.
+
+
+
+// DEBUG.  Dump out the hex codes for the KISS packet we just
+// created.
+/*
+    for (i = 0; i< j; i++) {
+        fprintf(stderr,"%02x ", transmit_txt2[i]);
+    }
+    fprintf(stderr,"\n\n");
+*/
+
 }
 
 
