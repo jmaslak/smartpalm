@@ -1,5 +1,10 @@
 // $Id$
 
+
+// Copyright (c) 2001, Joel C. Maslak
+// Portions Copyright (c) 2005, Curtis E. Mills, WE7U
+
+
 //	Resource: Talt 1100
 #define SerialInUseAlert                        1100
 #define SerialInUseOK                              0

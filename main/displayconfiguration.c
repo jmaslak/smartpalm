@@ -4,7 +4,8 @@
  * displayconfiguration.c
  *
  * SmartPalm Mobile APRS Display
- * Copyright (C) 2001-2005 by Joel C. Maslak
+ * Copyright (c) 2001, Joel C. Maslak
+ * Portions Copyright (c) 2005, Curtis E. Mills, WE7U
  * All Rights Reserved (see license)
  *
  */
