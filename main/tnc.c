@@ -390,7 +390,7 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 	Boolean command_received;
 
 	if (seed == 0) {
-#ifdef DEBUG
+#ifndef DEBUG
         seed++;
 #endif  // DEBUG
 	}
@@ -401,7 +401,8 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 
 // Here's where we could hand off a KISS packet to
 // decode_ax25_header(), then pass the parsed packet off to
-// handlePacket().
+// handlePacket().  We'd look for a KISS_FEND character here to
+// determine that.
 //
 //        if (!decode_ax25_header(theData, size)) {
 //            // Bad packet, drop it on the floor.
@@ -420,7 +421,7 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 // coderes is full (SmartPalm section .text)" from the compiler.
 
 #ifdef DEBUG
-#warning Compiling in sample packets
+#warning DEBUG MODE: Compiling in sample packets to decode on startup
 //
 // Might need to comment out some of these strings else we get: "region
 // coderes is full (SmartPalm section .text)" while compiling.
