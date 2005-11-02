@@ -616,7 +616,7 @@ void fix_up_callsign(unsigned char *data, int data_size) {
 // Create an AX25 frame and turn it into a KISS packet.  Dump it
 // into the transmit queue.
 //
-void send_ax25_frame(int port, char *source, char *destination, char *path, char *data) {
+void send_ax25_frame(char *source, char *destination, char *path, char *data) {
     unsigned char temp_source[15];
     unsigned char temp_dest[15];
     unsigned char temp[15];
