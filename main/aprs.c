@@ -41,9 +41,17 @@ static void    sendResetResponse(char * src);
 
 static char    status[37];
 
+
+
+
+
 void initStatus(void) {
 	StrCopy(status, VERSION_STRING);
 }	
+
+
+
+
 
 void handlePacket(char * theData) {
 	float mylat, mylon;
@@ -65,6 +73,10 @@ void handlePacket(char * theData) {
 	}
 }
 
+
+
+
+
 static void updateMySummary (float lat, float lon, int speed, int heading, UInt32 utc) {
 	setMyLatitude(lat);
 	setMyLongitude(lon);
@@ -72,6 +84,10 @@ static void updateMySummary (float lat, float lon, int speed, int heading, UInt3
 	setMyHeading(heading);
 	setUTC(utc);
 }
+
+
+
+
 
 static void updateRemoteSummary (int speed, int heading, int bearing, float distance,
 				 char * call, char * digis, char * payload) {
@@ -83,6 +99,10 @@ static void updateRemoteSummary (int speed, int heading, int bearing, float dist
 	setLastHeardDigipeaters(digis);
 	setLastHeardPayload(payload);
 }
+
+
+
+
 
 static void handleAX25(char * theData) {
 	char  payload[512];
@@ -106,6 +126,10 @@ static void handleAX25(char * theData) {
 		incrementDigipeatCount();
 	}
 }
+
+
+
+
 
 static void parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing, char * data, char * src, char * digipeaters) {
 	float lat, lon;
@@ -152,6 +176,10 @@ static void parse_APRS (char * payload, int * speed, int * heading, float * dist
 	*distance = computeDistance(getMyLatitude(), getMyLongitude(), lat, lon);
 	*bearing  = (int) (computeBearing (getMyLatitude(), getMyLongitude(), lat, lon) + .5);
 }
+
+
+
+
 
 static void parseThirdPartyHeader (char * payload, char * src, int * payload_offset, char * digipeaters) {
 	char tmpdigis[255];
@@ -232,6 +260,10 @@ static void parseThirdPartyHeader (char * payload, char * src, int * payload_off
 	}
 }
 
+
+
+
+
 static void handle_message (char * payload, char * data, char * src) {
 	if (StrLen(payload) < 12) {
 		StrCopy(data, payload);
@@ -257,6 +289,10 @@ static void handle_message (char * payload, char * data, char * src) {
 	return;
 }
 
+
+
+
+
 static void sendResetResponse(char * src) {
 	char packet[79];
 	char formatted_call[20];
@@ -280,6 +316,10 @@ static void sendResetResponse(char * src) {
 	}
 }
 
+
+
+
+
 static Boolean localRecipient(char * payload) {
 	int i;
 	char * cp;
@@ -297,6 +337,10 @@ static Boolean localRecipient(char * payload) {
 
 	return true;
 }
+
+
+
+
 
 static void parse_extension (char * extension, int * speed, int * heading, char * data) {
 	int i;
@@ -327,6 +371,10 @@ static void parse_extension (char * extension, int * speed, int * heading, char 
 	StrCopy(data, extension+7);
 }
 
+
+
+
+
 static void parse_location (char * location, float * lat, float * lon) {
 	char buffer[10];
 
@@ -343,6 +391,10 @@ static void parse_location (char * location, float * lat, float * lon) {
 	StrNCopy(buffer, location+9, 8);
 	*lon = gps2internal(buffer, location[17]);
 }
+
+
+
+
 
 static Boolean getAX25Header(char * theData, char * call, char * digipeaters, char * payload) {
 	int i;
@@ -382,6 +434,10 @@ static Boolean getAX25Header(char * theData, char * call, char * digipeaters, ch
 
 	return 1;
 }
+
+
+
+
 
 static void handleGPRMC(char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds)
 {
@@ -453,6 +509,10 @@ static void handleGPRMC(char * theData, float * lat, float * lon, int * speed, i
 	return;
 }
 
+
+
+
+
 void sendBeacon (void)
 {
 	char packet[71];  // Maximum APRS position report
@@ -501,6 +561,10 @@ void sendBeacon (void)
 
 	tncSendPacket(packet);
 }
+
+
+
+
 
 void smartBeacon(void)
 {
@@ -555,3 +619,5 @@ void smartBeacon(void)
 		gps_fuzz = 0;
 	}
 }
+
+
