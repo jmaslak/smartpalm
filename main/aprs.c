@@ -520,7 +520,7 @@ void smartBeacon(void)
 	
 	secs_since_beacon = getUTC() - last_beacon;
 
-	if (secs_since_beacon < getTurnBeaconRate()) {
+	if (secs_since_beacon < (UInt32)getTurnBeaconRate()) {
 		last_beacon_heading = getMyHeading();  // To allow for variation right after a turn
 	}
 
@@ -534,7 +534,7 @@ void smartBeacon(void)
 		if (heading_change < 0) { heading_change = 0 - heading_change; }
 		if (heading_change > 180) { heading_change = 360 - heading_change; }
 
-		if ((heading_change > turn_alarm) && (secs_since_beacon > getTurnBeaconRate())) {
+		if ((heading_change > turn_alarm) && (secs_since_beacon > (UInt32)getTurnBeaconRate())) {
 //			if (gps_fuzz++ > 2) {  // Throw away first two readings!
 				corner_peg = true;
 //			}
@@ -548,7 +548,7 @@ void smartBeacon(void)
 		}
 	}
 
-	if ((secs_since_beacon > beacon_rate) || (corner_peg)) {
+	if ((secs_since_beacon > (UInt32)beacon_rate) || (corner_peg)) {
 		sendBeacon();
 		last_beacon = getUTC();
 		last_beacon_heading = getMyHeading();
