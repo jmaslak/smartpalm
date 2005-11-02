@@ -59,7 +59,7 @@ Boolean GetField(const char *buffer, UInt n, char *result, UInt max)
 	UInt count = 0;
 	
 	// skip n commas
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < (int)n; i++) {
 		while (*buffer && *buffer != ',')
 			buffer++;
 		if (*buffer == '\0')
