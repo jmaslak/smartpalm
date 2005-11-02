@@ -20,7 +20,11 @@
 
 static struct ConfigurationInfo conf;
 
-void initConfiguration() {
+
+
+
+
+void initConfiguration(void) {
 	conf.magic            = MAGIC;
 	StrCopy(conf.digipeater_path, DEFAULT_DIGIPEATER_PATH);
 	StrCopy(conf.callsign,        DEFAULT_CALLSIGN);
@@ -30,7 +34,12 @@ void initConfiguration() {
 	conf.turn_beacon_rate = DEFAULT_TURN_BEACON_RATE;
 	conf.fast_beacon_rate = DEFAULT_FAST_BEACON_RATE;
 	conf.stop_beacon_rate = DEFAULT_STOP_BEACON_RATE;
+    conf.enable_KISS      = DEFAULT_KISS_MODE;
 }
+
+
+
+
 
 void writeConfiguration (void)
 {
@@ -53,6 +62,10 @@ void writeConfiguration (void)
 
 	DmCloseDatabase(dbref);
 }
+
+
+
+
 	
 void readConfiguration (void)
 {
@@ -74,51 +87,100 @@ void readConfiguration (void)
 	DmCloseDatabase(dbref);
 }
 
+
+
+
+
 char * getDigipeaterPath(void)
 {
 	return conf.digipeater_path;
 }
+
+
+
+
 
 char * getCallsign(void)
 {
 	return conf.callsign;
 }
 
+
+
+
+
 int getLowSpeed(void)
 {
 	return conf.low_speed;
 }
+
+
+
+
 
 int getHighSpeed(void)
 {
 	return conf.high_speed;
 }
 
+
+
+
+
 int getTurnThreshold(void)
 {
 	return conf.turn_threshold;
 }
+
+
+
+
 
 int getTurnBeaconRate(void)
 {
 	return conf.turn_beacon_rate;
 }
 
+
+
+
+
 int getFastBeaconRate(void)
 {
 	return conf.fast_beacon_rate;
 }
+
+
+
+
 
 int getStopBeaconRate(void)
 {
 	return conf.stop_beacon_rate;
 }
 
+
+
+
+
+int getKissEnable(void)
+{
+	return conf.enable_KISS;
+}
+
+
+
+
+
 void setDigipeaterPath(char * path)
 {
 	StrCopy(conf.digipeater_path, path);
 	writeConfiguration();
 }
+
+
+
+
 
 void setCallsign(char * call)
 {
@@ -127,11 +189,19 @@ void setCallsign(char * call)
 }
 
 
+
+
+
+
 void setLowSpeed(int speed)
 {
 	conf.low_speed = speed;
 	writeConfiguration();
 }
+
+
+
+
 
 void setHighSpeed(int speed)
 {
@@ -139,11 +209,19 @@ void setHighSpeed(int speed)
 	writeConfiguration();
 }
 
+
+
+
+
 void setTurnThreshold(int threshold)
 {
 	conf.turn_threshold = threshold;
 	writeConfiguration();
 }
+
+
+
+
 
 void setTurnBeaconRate(int rate)
 {
@@ -151,17 +229,39 @@ void setTurnBeaconRate(int rate)
 	writeConfiguration();
 }
 
+
+
+
+
 void setFastBeaconRate(int rate)
 {
 	conf.fast_beacon_rate = rate;
 	writeConfiguration();
 }
 
+
+
+
+
 void setStopBeaconRate(int rate)
 {
 	conf.stop_beacon_rate = rate;
 	writeConfiguration();
 }
+
+
+
+
+
+void setKissEnable(int param)
+{
+	conf.enable_KISS = param;
+    writeConfiguration();
+}
+
+
+
+
 
 int configuredCallsign(void)
 {
@@ -171,3 +271,5 @@ int configuredCallsign(void)
 
 	return 1;
 }
+
+

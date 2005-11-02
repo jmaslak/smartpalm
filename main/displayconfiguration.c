@@ -172,11 +172,24 @@ static void saveAPRSConfiguration(void)
 
 
 
+static void APRSTncConfigurationUpdate(void)
+{
+	FormPtr frm = FrmGetActiveForm();
+	
+    FrmSetControlValue(frm,
+        FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss),
+        getKissEnable());
+}
+
+
+
+
+
 static void APRSTncConfigurationInit(void)
 {
 	FormPtr frm = FrmGetActiveForm();
 	FrmDrawForm(frm);
-//	APRSConfigurationUpdate();
+	APRSTncConfigurationUpdate();
 }
 
 
@@ -207,7 +220,12 @@ Boolean APRSTncConfigurationHandleEvent(EventPtr event)
 		break;
 
 	case ctlSelectEvent:
-		if (event->data.ctlSelect.controlID == APRSTncConfigurationApplyButton) {
+        if (event->data.ctlSelect.controlID == APRSTncConfigurationEnableKiss) {
+            FormPtr frm = FrmGetActiveForm();
+            setKissEnable( FrmGetControlValue(frm, FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss)));
+//            saveAPRSConfiguration();
+        }
+		else if (event->data.ctlSelect.controlID == APRSTncConfigurationApplyButton) {
 //			if((error = checkAPRSConfiguration()) == NULL) {
 //				saveAPRSConfiguration();
 //				tncConfig();
@@ -216,7 +234,8 @@ Boolean APRSTncConfigurationHandleEvent(EventPtr event)
 //			} else {
 //				FrmCustomAlert(APRSConfigurationErrorAlert, error, NULL, NULL);
 //			}
-		} else if (event->data.ctlSelect.controlID == APRSTncConfigurationCancelButton) {
+		}
+        else if (event->data.ctlSelect.controlID == APRSTncConfigurationCancelButton) {
 			FrmGotoForm(APRSSummaryForm);
 		}
 

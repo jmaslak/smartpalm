@@ -61,6 +61,7 @@
 #define APRSTncConfigurationForm			1005
 #define APRSTncConfigurationCancelButton	1006
 #define APRSTncConfigurationApplyButton		1007
+#define APRSTncConfigurationEnableKiss      1008
 
 //	Resource tFRM 1003
 #define APRSReadForm				1003

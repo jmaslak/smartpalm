@@ -57,7 +57,7 @@ END
 FORM ID APRSTncConfigurationForm AT (0 0 160 160)
 BEGIN
 	TITLE "TNC Configuration"
-    CHECKBOX "Enable KISS Mode" AUTOID AT (4 14 151 24) FONT 1
+    CHECKBOX "Enable KISS Mode" ID APRSTncConfigurationEnableKiss AT (4 14 151 24) FONT 1
 	LABEL "KISS Mode is not implemented yet" AUTOID AT (4 50) FONT 0
     LABEL "Coming soon to a Palm near you!" AUTOID AT (4 62) FONT 0
 	BUTTON "OK" ID APRSTncConfigurationApplyButton AT (40 140 35 16)
