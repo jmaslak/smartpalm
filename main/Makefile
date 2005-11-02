@@ -8,14 +8,15 @@
 CC = m68k-palmos-gcc
 # CFLAGS = -palmos3.1 -Wall -g -DERROR_CHECK_LEVEL=2 # -g -O2
 #CFLAGS = -palmos3.1 -Wall -g # -g -O2
-CFLAGS = -palmos4.0 -Wall -g # -g -O2
+#CFLAGS = -palmos4.0 -Wall -g -O2 # -g -O2
+CFLAGS = -O2 -pipe -W -Wall -Wpointer-arith -Wstrict-prototypes
 LIBS = -lm -lnfm --static
 
 APP=SmartPalm
 RCPFILE=$(APP).rcp
 OBJS=aprs.o displayconfiguration.o displaysummary.o statistics.o configuration.o displayread.o main.o tnc.o database.o displaysend.o receivedmessage.o utils.o 
 CRID=APRD
-NAME="APRS Display"
+NAME="SmartPalm APRS"
 
 all:	$(APP).prc
 
@@ -36,7 +37,7 @@ grc.stamp: $(APP)
 	touch grc.stamp
 
 bin.stamp: $(RCPFILE) 
-	pilrc $(RCPFILE) 
+	pilrc -q $(RCPFILE) 
 	touch bin.stamp
 
 clean:
