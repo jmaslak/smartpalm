@@ -420,8 +420,9 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 // coderes is full (SmartPalm section .text)" from the compiler.
 
 #ifdef DEBUG
+#warning Compiling in sample packets
 //
-// Must comment out some of these strings else we get: "region
+// Might need to comment out some of these strings else we get: "region
 // coderes is full (SmartPalm section .text)" while compiling.
 //
 		handlePacket("$GPRMC,211042.999,A,4118.3969,N,10534.5610,W,0.05,128.74,251100,,*1E");
@@ -433,13 +434,13 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD{111");
 		handlePacket("N0CALL>GPS::N7XUC-3  :ABCD{111");
 		handlePacket("N0CALL>GPS::N7XUC-4  :ABCD{111");
-//		handlePacket("KD7TA-7>APRS:!4118.75NN10534.78W#PHG2360/kd7ta@arrl.net.");
-//		handlePacket("KD7TA-5>GPS:!4118.41N/10533.93W&PHG3160/30m>2M Gate kd7ta@arrl.net.");
-// 		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
-//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*,KK7CN-8*,WB7GR-9*,WIDE*:}WB7GR-9>GPSLK,TCPIP,KJ7AZ*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
-//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*:!4117.59NN10535.59W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
-//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYSRESET!{30");
-//		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYS!{30");
+		handlePacket("KD7TA-7>APRS:!4118.75NN10534.78W#PHG2360/kd7ta@arrl.net.");
+		handlePacket("KD7TA-5>GPS:!4118.41N/10533.93W&PHG3160/30m>2M Gate kd7ta@arrl.net.");
+ 		handlePacket("N7XUC-9>GPS,RELAY*,WIDE4-4:$GPRMC,210955.999,A,4118.3965,N,10534.5615,W,0.06,108.56,251100,,*18");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*,KK7CN-8*,WB7GR-9*,WIDE*:}WB7GR-9>GPSLK,TCPIP,KJ7AZ*:!4109.51NN10444.17W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*:!4117.59NN10535.59W#PHG5000/10W/Cheyenne, WY wb7gr@arrl.net..");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYSRESET!{30");
+		handlePacket("KJ7AZ-6>APW247,KJ7AZ-5*::N7XUC-2  :!SYS!{30");
 #endif  // DEBUG
 		
 		updateSummary();
@@ -742,5 +743,168 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
 */
 
 }
+
+
+
+
+
+// This function was originally written for the GPL'ed Xastir
+// project by Curt Mills, WE7U.  The code for this function is
+// hereby released under the SmartPalm BSD-style license.
+//
+// Send a KISS configuration command to the selected port.
+// The KISS spec allows up to 16 devices to be configured.  We
+// support that here with the "device" input, which should be
+// between 0 and 15.  The commands accepted are integer values:
+//
+// 0x01 TXDELAY
+// 0x02 P-Persistence
+// 0x03 SlotTime
+// 0x04 TxTail
+// 0x05 FullDuplex
+// 0x06 SetHardware
+// 0xff Exit from KISS mode (not implemented yet)
+//
+void send_kiss_config(int port, int device, int command, int value) {
+    unsigned char transmit_txt[MAX_LINE_SIZE+1];
+    int i, j;
+    int erd;
+//    int write_in_pos_hold;
+
+
+    if (device < 0 || device > 15) {
+//        fprintf(stderr,"send_kiss_config: out-of-range value for device\n");
+        return;
+    }
+
+    if (command < 1 || command > 6) {
+//        fprintf(stderr,"send_kiss_config: out-of-range value for command\n");
+        return;
+    }
+
+    if (value < 0 || value > 255) {
+//        fprintf(stderr,"send_kiss_config: out-of-range value for value\n");
+        return;
+    }
+
+    // Add the KISS framing characters and do the proper escapes.
+    j = 0;
+    transmit_txt[j++] = KISS_FEND;
+
+    transmit_txt[j++] = (device << 4) | (command & 0x0f);
+
+    transmit_txt[j++] = value & 0xff;
+
+    transmit_txt[j++] = KISS_FEND;
+
+    // Terminate the string, but don't increment the 'j' counter.
+    // We don't want to send the NULL byte out the KISS interface,
+    // just make sure the string is terminated in all cases.
+    //
+    transmit_txt[j] = '\0';
+
+
+
+
+//-------------------------------------------------------------------
+// Had to snag code from port_write_string() below because our
+// string
+// needs to have 0x00 chars inside it.  port_write_string() can't
+// handle that case.  It's a good thing the transmit queue stuff
+// could handle it.
+//-------------------------------------------------------------------
+
+    erd = 0;
+
+//    write_in_pos_hold = port_data[port].write_in_pos;
+
+    for (i = 0; i < j && !erd; i++) {
+//        port_data[port].device_write_buffer[port_data[port].write_in_pos++] = transmit_txt[i];
+//        if (port_data[port].write_in_pos >= MAX_DEVICE_BUFFER)
+//            port_data[port].write_in_pos = 0;
+
+//        if (port_data[port].write_in_pos == port_data[port].write_out_pos) {
+//                fprintf(stderr,"Port %d Buffer overrun\n",port);
+
+            /* clear this restore original write_in pos and dump * this string */
+//            port_data[port].write_in_pos = write_in_pos_hold;
+//            port_data[port].errors++;
+            erd = 1;
+//        }
+    }
+}
+
+
+
+
+
+/*
+// This code was originally written for the GPL'ed Xastir
+// project by Curt Mills, WE7U.  This code is hereby released under
+// the SmartPalm BSD-style license.  We'll eventually add it to the
+// code which is receiving the data character-by-character.
+// 
+// Do special KISS packet processing here.  We save the last
+// character in port_data[port].channel2, as it is otherwise only
+// used for AX.25 ports.
+
+if ( (port_data[port].device_type == DEVICE_SERIAL_KISS_TNC)
+        || (port_data[port].device_type == DEVICE_SERIAL_MKISS_TNC) ) {
+
+    if (port_data[port].channel2 == KISS_FESC) { // Frame Escape char
+        if (cin == KISS_TFEND) { // Transposed Frame End char
+
+            // Save this char for next time around
+            port_data[port].channel2 = cin;
+
+            cin = KISS_FEND;
+        }
+        else if (cin == KISS_TFESC) { // Transposed Frame Escape char
+
+            // Save this char for next time around
+            port_data[port].channel2 = cin;
+
+            cin = KISS_FESC;
+        }
+        else {
+            port_data[port].channel2 = cin;
+        }
+    }
+    else if (port_data[port].channel2 == KISS_FEND) { // Frame End char
+        // Frame start or frame end.  Drop the next character which
+        // should either be another frame end or a type byte.
+
+// Note this "type" byte is where it specifies which KISS interface
+// the packet came from.  We may want to use this later for
+// multi-drop KISS or other types of KISS protocols.
+
+        // Save this char for next time around
+        port_data[port].channel2 = cin;
+//fprintf(stderr,"Byte: %02x\n", cin);
+        skip++;
+    }
+    else if (cin == KISS_FESC) { // Frame Escape char
+        port_data[port].channel2 = cin;
+        skip++;
+    }
+    else {
+        port_data[port].channel2 = cin;
+    }
+}   // End of first special KISS processing
+
+
+
+// We shouldn't see any AX.25 flag characters on a KISS interface
+// because they are stripped out by the KISS code.  What we should
+// see though are KISS_FEND characters at the beginning of each
+// packet.  These characters are where we should break the data
+// apart in order to send strings to the decode routines.  It may be
+// just fine to still break it on \r or \n chars, as the KISS_FEND
+// should appear immediately afterwards in properly formed packets.
+
+
+// This is how we know we're at the end of a KISS frame.
+if (cin == KISS_FEND)
+*/
 
 
