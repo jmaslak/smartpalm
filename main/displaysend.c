@@ -28,6 +28,10 @@ static void    APRSSendUpdate(void);
 
 static char    lastack[6];
 
+
+
+
+
 static void APRSSendInit(void)
 {
 	FormPtr frm = FrmGetActiveForm();
@@ -36,9 +40,17 @@ static void APRSSendInit(void)
 	APRSSendUpdate();
 }
 
+
+
+
+
 static void APRSSendUpdate(void)
 {
 }
+
+
+
+
 
 Boolean APRSSendHandleEvent(EventPtr event)
 {
@@ -136,11 +148,16 @@ Boolean APRSSendHandleEvent(EventPtr event)
 	return(handled);
 }
 
-void ackMessage(char * payload, char * src) {
+
+
+
+
+void ackMessage(char * payload) {
 	if (StrLen(payload) > 5) {
 		return;
 	}
 
 	StrCopy(lastack, payload);
 }
+
 

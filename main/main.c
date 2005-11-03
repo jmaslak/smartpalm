@@ -150,6 +150,15 @@ DWord PilotMain(Word cmd, Ptr cmdPBP, Word launchFlags)
 			StopApplication();
 		}
 	}
+    else {
+        //
+        // Some other type of launch.  Do something with
+        // cmdPBP/launchFlags in order to get rid of "unused
+        // variable" compiler warnings.
+        //
+        if (cmdPBP == NULL || launchFlags) {
+        }
+    }
 	return 0;
 }
 

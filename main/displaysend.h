@@ -12,7 +12,7 @@
 #ifndef SP_displaysend_H_
 #define SP_displaysend_H_ 1
 
-extern void    ackMessage(char * payload, char * src);
+extern void    ackMessage(char * payload);
 extern Boolean APRSSendHandleEvent(EventPtr event);
 
 #endif

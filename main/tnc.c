@@ -30,7 +30,7 @@
 
 static UInt    gSerialRefNum;
 static VoidPtr gSerialBuffer = NULL;
-static Boolean getSerialCharacter(char * theData, int size, int * current_character, unsigned int timeout);
+static Boolean getSerialCharacter(char * theData, int * current_character, unsigned int timeout);
 
 
 
@@ -80,7 +80,7 @@ void closeSerial(void) {
 
 
 
-static Boolean getSerialCharacter(char * theData, int size, int * current_character, unsigned int timeout) {
+static Boolean getSerialCharacter(char * theData, int * current_character, unsigned int timeout) {
 	ULong numBytesPending;
 	Err err;
 	int complete_packet = 0;
@@ -383,7 +383,6 @@ int decode_ax25_header(unsigned char *incoming_data, int length) {
 
 Boolean processPendingSerialCharacter (unsigned int timeout) {
 	static char theData[300];
-	static int size = 299;
 	static int current_character = 0;
 	static int seed = 0;
 	
@@ -395,7 +394,7 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 #endif  // DEBUG
 	}
 
-	command_received = getSerialCharacter(theData, size, &current_character, timeout);
+	command_received = getSerialCharacter(theData, &current_character, timeout);
 	if (command_received) {
 
 
@@ -538,7 +537,7 @@ void tncSendPacket (char * s)
 // byte.  The callsign as processed is ready for inclusion in an
 // AX.25 header.
 //
-void fix_up_callsign(unsigned char *data, int data_size) {
+void fix_up_callsign(unsigned char *data) {
     unsigned char new_call[8] = "       ";  // Start with seven spaces
     int ssid = 0;
     int i;
@@ -603,7 +602,6 @@ void fix_up_callsign(unsigned char *data, int data_size) {
 
     // Write over the top of the input string with the newly
     // formatted callsign
-//    snprintf((char *)data, data_size, "%s", new_call);
     sprintf((char *)data, "%s", new_call);
 }
 
@@ -637,7 +635,7 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
 //    snprintf((char *)temp_dest, sizeof(temp_dest), "%s", destination);
     sprintf((char *)temp_dest, "%s", destination);
  
-    fix_up_callsign(temp_dest, sizeof(temp_dest));
+    fix_up_callsign(temp_dest);
 //    snprintf((char *)transmit_txt, sizeof(transmit_txt), "%s", temp_dest);
     sprintf((char *)transmit_txt, "%s", temp_dest);
 
@@ -647,7 +645,7 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
 //    snprintf((char *)temp_source, sizeof(temp_source), "%s", source);
     sprintf((char *)temp_source, "%s", source);
  
-    fix_up_callsign(temp_source, sizeof(temp_source));
+    fix_up_callsign(temp_source);
     strncat((char *)transmit_txt,
         (char *)temp_source,
         sizeof(transmit_txt) - strlen((char *)transmit_txt));
@@ -667,7 +665,7 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
                 j++;
             }
 
-            fix_up_callsign(temp, sizeof(temp));
+            fix_up_callsign(temp);
             strncat((char *)transmit_txt,
                 (char *)temp,
                 sizeof(transmit_txt) - strlen((char *)transmit_txt));
@@ -766,7 +764,7 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
 // 0x06 SetHardware
 // 0xff Exit from KISS mode (not implemented yet)
 //
-void send_kiss_config(int port, int device, int command, int value) {
+void send_kiss_config(int device, int command, int value) {
     unsigned char transmit_txt[MAX_LINE_SIZE+1];
     int i, j;
     int erd;

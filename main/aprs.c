@@ -272,7 +272,7 @@ static void handle_message (char * payload, char * data, char * src) {
 	
 	if (localRecipient(payload)) {
 		if (!StrNCompare(payload+10, "ack", 3)) {
-			ackMessage(payload+13, src);  // XXX
+			ackMessage(payload+13);  // XXX
 		} else if (!StrNCompare(payload+10, "rej", 3)) {
 //			rejMessage(payload+13, src);  // XXX
 		} else if (!StrNCompare(payload+10, "!SYSRESET!", 10)) {

@@ -30,6 +30,9 @@ static VoidHand inDatabase(char * call, char * mpart, char * id, Word database);
 static UInt32	nextacktime = 0l;
 
 
+
+
+
 void receivedMessageDelete(void)
 {
 	DmOpenRef dbref;
@@ -47,6 +50,10 @@ void receivedMessageDelete(void)
 	DmCloseDatabase(dbref);
 }
 
+
+
+
+
 UInt receivedMessageCount(void)
 {
 	DmOpenRef dbref;
@@ -58,6 +65,10 @@ UInt receivedMessageCount(void)
 
 	return totalMessages;
 }
+
+
+
+
 
 void storeMessage(char * payload, char * src) {
 	char mpart[68];
@@ -106,12 +117,22 @@ void storeMessage(char * payload, char * src) {
 	}
 }
 
+
+
+
+
 static VoidHand inDatabase(char * call, char * mpart, char * id, Word database)
 {
 	DmOpenRef dbref;
 	UInt totalMessages;
 	UInt i;
 	struct Message * mp;
+
+
+    // Mess with these variables so that the compiler shuts up about
+    // unused variables.    
+    if (mpart == NULL) {}
+    if (database) {}
 
 	dbref = DmOpenDatabaseByTypeCreator(dbReceived, getCreatorID(), dmModeReadWrite);
 	totalMessages = DmNumRecordsInCategory(dbref, dmAllCategories);
@@ -134,6 +155,10 @@ static VoidHand inDatabase(char * call, char * mpart, char * id, Word database)
 
 	return 0;
 }
+
+
+
+
 
 static void addToDatabase(char * call, char * mpart, char * id, Word database) {
 	struct Message * mp;
@@ -158,6 +183,10 @@ static void addToDatabase(char * call, char * mpart, char * id, Word database) {
 
 	DmCloseDatabase(dbref);
 };	
+
+
+
+
 
 void sendAck(char * payload, char * src) {
 	char mpart[68];
@@ -197,3 +226,5 @@ void sendAck(char * payload, char * src) {
 		}
 	}
 }
+
+
