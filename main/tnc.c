@@ -85,6 +85,7 @@ static Boolean getSerialCharacter(char * theData, int * current_character, unsig
 	Err err;
 	int complete_packet = 0;
 
+
 	// We read one byte at a time...
 	err = SerReceiveWait(gSerialRefNum, 1, timeout);
 	if (err == serErrLineErr) {
@@ -111,6 +112,19 @@ static Boolean getSerialCharacter(char * theData, int * current_character, unsig
 			*(theData + 298) = '\0';
 			complete_packet = 1;
 		}
+
+
+// Check whether we're using KISS protocol
+if (getKissEnable()) {
+    // Yes, we're using KISS protocol.  Either get the serial chars
+    // one char at a time and convert or process the incoming string
+    // all at once when we get a FEND character.  Another method
+    // would be to just change the complete_packet logic here to
+    // wait for a FEND character before returning, and do the rest
+    // of the KISS processing one layer up.
+}
+
+
 		numBytes = SerReceive(gSerialRefNum, theData + *current_character, 1, 0, &err);
 		if (err == serErrLineErr) {
 			SerClearErr(gSerialRefNum);
