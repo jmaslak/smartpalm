@@ -11,8 +11,8 @@ CC = m68k-palmos-gcc
 #CFLAGS = -palmos3.1 -Wall -g # -g -O2
 #CFLAGS = -palmos4.0 -Wall -g -O2 # -g -O2
 #
-#CFLAGS = -O2 -pipe -W -Wall -Wpointer-arith -Wstrict-prototypes # More error checking
-CFLAGS = -O2 -pipe -Wall -Wpointer-arith -Wstrict-prototypes # Less error checking
+CFLAGS = -O2 -pipe -W -Wall -Wpointer-arith -Wstrict-prototypes # More error checking
+#CFLAGS = -O2 -pipe -Wall -Wpointer-arith -Wstrict-prototypes # Less error checking
 #
 LIBS = -lm -lnfm --static
 
