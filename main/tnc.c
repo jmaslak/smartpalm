@@ -49,8 +49,14 @@ Boolean initSerial(void) {
 	
 	err = SysLibFind("Serial Library", &gSerialRefNum);
 	ErrFatalDisplayIf(err != 0, "Can't find serial library");
-	
-	err = SerOpen(gSerialRefNum, 0, 9600);
+
+
+//WE7U:
+// The user should be able to set the serial port baud rate instead
+// of having it hard-coded here.
+
+
+    err = SerOpen(gSerialRefNum, 0, 9600);
 	if (err != 0) {
 		if (err == serErrAlreadyOpen) {
 			FrmAlert(SerialInUseAlert);
@@ -554,17 +560,6 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 	command_received = getSerialCharacter(theData, &current_character, timeout);
 	if (command_received) {
 
-
-// Here's where we could hand off a KISS packet to
-// decode_ax25_header(), then pass the parsed packet off to
-// handlePacket().  We'd look for a KISS_FEND character here to
-// determine that.
-//
-//        if (!decode_ax25_header(theData, size)) {
-//            // Bad packet, drop it on the floor.
-//        }
- 
-
 		handlePacket(theData);
 
 		theData[0] = '\0';
@@ -614,12 +609,24 @@ void tncSend (char *s)
 {
 	Err err;
 
-	SerSend(gSerialRefNum, s, StrLen(s), &err);
+    // Check whether we're using KISS protocol.  If so, we
+    // process each character and the buffer differently.
+    //
+    if (!getKissEnable()) {
+        //
+        // Normal command-line TNC mode
+        //
+    	SerSend(gSerialRefNum, s, StrLen(s), &err);
 
-	if (err == serErrLineErr) {
-		SerClearErr(gSerialRefNum);
-	}
-	
+    	if (err == serErrLineErr) {
+    		SerClearErr(gSerialRefNum);
+    	}
+    }
+    else {
+        //
+        // KISS TNC mode
+        //
+    }
 }
 
 
