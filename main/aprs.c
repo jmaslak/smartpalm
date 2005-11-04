@@ -24,15 +24,15 @@
 #include "utils.h"
 
 
-static void    handleAX25(char * theData);
+static void    handleAX25(unsigned char * theData);
 static void    parse_APRS (char * payload, int * speed, int * heading, float * distance, int * bearing,
 			   char * data, char * src, char * digipeaters);
 static void    handle_message (char * payload, char * data, char * src);
 static Boolean localRecipient(char * payload);
 static void    parse_extension (char * extension, int * speed, int * heading, char * data);
 static void    parse_location (char * location, float * lat, float * lon);
-static Boolean getAX25Header(char * theData, char * call, char * digipeaters, char * payload);
-static void    handleGPRMC(char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds);
+static Boolean getAX25Header(unsigned char * theData, char * call, char * digipeaters, char * payload);
+static void    handleGPRMC(unsigned char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds);
 static void    updateMySummary (float lat, float lon, int speed, int heading, UInt32 utc);
 static void    updateRemoteSummary (int speed, int heading, int bearing, float distance,
 				    char * call, char * digis, char * payload);
@@ -53,7 +53,7 @@ void initStatus(void) {
 
 
 
-void handlePacket(char * theData) {
+void handlePacket(unsigned char * theData) {
 	float mylat, mylon;
 	int speed, heading;
 	UInt32 utc;
@@ -104,7 +104,7 @@ static void updateRemoteSummary (int speed, int heading, int bearing, float dist
 
 
 
-static void handleAX25(char * theData) {
+static void handleAX25(unsigned char * theData) {
 	char  payload[512];
 	char  call[10];
 	char  digipeaters[256];
@@ -396,7 +396,7 @@ static void parse_location (char * location, float * lat, float * lon) {
 
 
 
-static Boolean getAX25Header(char * theData, char * call, char * digipeaters, char * payload) {
+static Boolean getAX25Header(unsigned char * theData, char * call, char * digipeaters, char * payload) {
 	int i;
 
 	call[8] = '\0';
@@ -439,7 +439,7 @@ static Boolean getAX25Header(char * theData, char * call, char * digipeaters, ch
 
 
 
-static void handleGPRMC(char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds)
+static void handleGPRMC(unsigned char * theData, float * lat, float * lon, int * speed, int * course, UInt32 * seconds)
 {
 	char s[12], slat[12], slon[12];
 	char latdir, londir;

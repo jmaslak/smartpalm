@@ -28,9 +28,16 @@
 #include "statistics.h"
 
 
+
 static UInt    gSerialRefNum;
 static VoidPtr gSerialBuffer = NULL;
-static Boolean getSerialCharacter(char * theData, int * current_character, unsigned int timeout);
+static Boolean getSerialCharacter(unsigned char * theData, int * current_character, unsigned int timeout);
+
+// Here's where we store the previous char received, needed for KISS
+// escape character processing so that we can reconstruct the
+// original data packet from the KISS data.
+static int last_received_KISS_char = 0x00;
+static int skip_serial_char = 0;
 
 
 
@@ -74,75 +81,6 @@ void closeSerial(void) {
 	}
 	
 	SerClose(gSerialRefNum);
-}
-
-
-
-
-
-static Boolean getSerialCharacter(char * theData, int * current_character, unsigned int timeout) {
-	ULong numBytesPending;
-	Err err;
-	int complete_packet = 0;
-
-
-	// We read one byte at a time...
-	err = SerReceiveWait(gSerialRefNum, 1, timeout);
-	if (err == serErrLineErr) {
-		SerClearErr(gSerialRefNum);
-		return 0;
-	}
-
-	err = SerReceiveCheck(gSerialRefNum, &numBytesPending);
-	
-	if (err == serErrLineErr) {
-		SerClearErr(gSerialRefNum);
-		return 0;
-	}
-	
-	ErrFatalDisplayIf(err != 0, "SerReceiveCheckFail");  // Misc. Error
-
-	while (numBytesPending > 0) {
-		ULong numBytes;
-
-		numBytesPending--;
-		
-		if (*current_character > 297) {
-			*current_character = 297;
-			*(theData + 298) = '\0';
-			complete_packet = 1;
-		}
-
-
-// Check whether we're using KISS protocol
-if (getKissEnable()) {
-    // Yes, we're using KISS protocol.  Either get the serial chars
-    // one char at a time and convert or process the incoming string
-    // all at once when we get a FEND character.  Another method
-    // would be to just change the complete_packet logic here to
-    // wait for a FEND character before returning, and do the rest
-    // of the KISS processing one layer up.
-}
-
-
-		numBytes = SerReceive(gSerialRefNum, theData + *current_character, 1, 0, &err);
-		if (err == serErrLineErr) {
-			SerClearErr(gSerialRefNum);
-			return 0;
-		}
-	       if ((theData[*current_character] == 10) || (theData[*current_character] == 13)) {
-			theData[*current_character] = '\0';
-			if (*current_character > 0) {
-				complete_packet = 1;
-				return complete_packet;
-			}
-		} else {
-			(*current_character)++;
-			theData[*current_character] = '\0';
-		}
-	}
-
-	return complete_packet;
 }
 
 
@@ -395,8 +333,213 @@ int decode_ax25_header(unsigned char *incoming_data, int length) {
 
 
 
+// The KISS protocol portion of the code here was originally written
+// for the GPL'ed Xastir project by Curt Mills, WE7U.  This portion
+// of the code is hereby released under the SmartPalm BSD-style license.
+// 
+// Do special KISS packet processing here.  We save the last
+// character in "last_received_KISS_char".
+//
+// We shouldn't see any AX.25 flag characters on a KISS interface
+// because they are stripped out by the KISS code.  What we should
+// see though are KISS_FEND characters at the beginning of each
+// packet.  These characters are where we should break the data
+// apart in order to send strings to the decode routines.  It may be
+// just fine to still break it on \r or \n chars, as the KISS_FEND
+// should appear immediately afterwards in properly formed packets.
+//
+static Boolean getSerialCharacter(unsigned char *theData, int *current_character, unsigned int timeout) {
+	ULong numBytesPending;
+	Err err;
+	int complete_packet = 0;
+
+
+	// We read one byte at a time...
+	err = SerReceiveWait(gSerialRefNum, 1, timeout);
+	if (err == serErrLineErr) {
+		SerClearErr(gSerialRefNum);
+		return 0;
+	}
+
+	err = SerReceiveCheck(gSerialRefNum, &numBytesPending);
+	
+	if (err == serErrLineErr) {
+		SerClearErr(gSerialRefNum);
+		return 0;
+	}
+	
+	ErrFatalDisplayIf(err != 0, "SerReceiveCheckFail");  // Misc. Error
+
+	while (numBytesPending > 0) {
+		ULong numBytes;
+
+		numBytesPending--;
+
+        // Check whether we're about to exceed our buffer length.
+        // If so, terminate the packet early and process.
+		if (*current_character > 297) {
+			*current_character = 297;
+			*(theData + 298) = '\0';
+			complete_packet = 1;
+		}
+
+        // Fetch the received char from the serial subsystem
+		numBytes = SerReceive(gSerialRefNum, theData + *current_character, 1, 0, &err);
+
+		if (err == serErrLineErr) {
+			SerClearErr(gSerialRefNum);
+			return 0;
+		}
+
+//-------------------------------------------------------------------
+
+        // Check whether we're using KISS protocol.  If so, we
+        // process each character and the buffer differently.
+        //
+        if (getKissEnable()) {
+
+            // Yes, we're using KISS protocol.  Check for special
+            // KISS characters and translate them back to the
+            // original data where necessary.
+
+            // Save the latest char temporarily in the new_char
+            // variable.
+            unsigned char new_char = theData[*current_character];
+
+
+            // See if we're supposed to skip a character this
+            // go-around
+            //
+            if (skip_serial_char) {
+
+                // Yes.  Don't increment the buffer pointer.  This
+                // will cause the next iteration to overwrite the
+                // character in the buffer.  We save this char in
+                // "last_received_KISS_char" for the next iteration.
+
+                // Reset the flag
+                skip_serial_char = 0;
+            }
+
+            else if (new_char == KISS_FESC) { // Frame Escape char
+
+                // Don't increment the buffer pointer.  This will
+                // cause the next iteration to overwrite the
+                // character in the buffer.  We save the KISS_FESC
+                // char in "last_received_KISS_char" for the next
+                // iteration.  We expect to see a KISS_TFEND or
+                // KISS_TFESC next iteration (see the next block
+                // below).
+
+            }
+
+            else if (last_received_KISS_char == KISS_FESC) { // Frame Escape char
+
+                if (new_char == KISS_TFEND) { // Transposed Frame End char
+
+                    // Change the received character back to its
+                    // original form.  Increment the buffer pointer.
+                    //
+                    theData[(*current_character)++] = KISS_FEND;
+                }
+
+                else if (new_char == KISS_TFESC) { // Transposed Frame Escape char
+
+                    // Change the received character back to its
+                    // original form.  Increment the buffer pointer.
+                    //
+                    theData[(*current_character)++] = KISS_FESC;
+                }
+            }
+
+            else if (last_received_KISS_char == KISS_FEND) { // Frame End char
+
+                // Frame start or frame end.  Drop the next
+                // character which should either be another frame
+                // end or a type byte.  Note this "type" byte is
+                // where it specifies which KISS interface the
+                // packet came from.  We may want to use this later
+                // for multi-drop KISS or other types of KISS
+                // protocols.
+                //
+                // Don't increment the buffer pointer which will
+                // cause the next iteration to overwrite the
+                // character in the buffer.
+
+                // Skip the next character to be read from the
+                // serial port, which will be either a KISS_FEND or
+                // a "type" byte.
+                skip_serial_char++;
+
+                // Decode the KISS packet, creating a TAPR2-style
+                // packet from it.
+                //
+                if ( decode_ax25_header(theData, (*current_character)+1) ) {
+                    // Good KISS packet decode
+                    complete_packet = 1;
+                    return complete_packet;
+                }
+                else {
+                    // Bad KISS packet decode
+
+// What to do here?  Flush the buffer and start over?  We shouldn't
+// get a bad packet from the TNC, so either we're not decoding it
+// properly or we're getting errors introduced between the TNC and
+// the Palm computer.
+
+                    // Reset the buffer back to the start
+                    // conditions.
+                    *current_character = 0;
+                    skip_serial_char = 0;
+                    new_char = 0;
+                }
+            }
+
+            else {
+
+                // It's a normal character (not one of the special
+                // KISS characters).  Increment the buffer pointer.
+                //
+                (*current_character)++;
+            }
+
+            // Save the current char for the next iteration.
+            last_received_KISS_char = new_char;
+        }
+
+//-------------------------------------------------------------------
+
+        else {  // Normal command-mode TNC (not KISS)
+
+            // Look for <CR> or <LF> characters
+    	    if ((theData[*current_character] == 10) || (theData[*current_character] == 13)) {
+
+                // Found the end of a line!  Terminate the string
+                // and send the buffer off for processing.
+                //
+                theData[*current_character] = '\0';
+                if (*current_character > 0) {
+                    complete_packet = 1;
+                    return complete_packet;
+                }
+            }
+            else {
+                // Not at the end of a line yet.
+                (*current_character)++;
+                theData[*current_character] = '\0';
+            }
+        }
+    }
+
+	return complete_packet;
+}
+
+
+
+
+
 Boolean processPendingSerialCharacter (unsigned int timeout) {
-	static char theData[300];
+	static unsigned char theData[300];
 	static int current_character = 0;
 	static int seed = 0;
 	
@@ -467,7 +610,7 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 
 
 
-void tncSend (char * s)
+void tncSend (char *s)
 {
 	Err err;
 
@@ -521,7 +664,7 @@ void tncInit(void)
 
 
 
-void tncSendPacket (char * s)
+void tncSendPacket (char *s)
 {
 	if (!configuredCallsign()) { return; }
 	
@@ -846,78 +989,5 @@ void send_kiss_config(int device, int command, int value) {
 //        }
     }
 }
-
-
-
-
-
-/*
-// This code was originally written for the GPL'ed Xastir
-// project by Curt Mills, WE7U.  This code is hereby released under
-// the SmartPalm BSD-style license.  We'll eventually add it to the
-// code which is receiving the data character-by-character.
-// 
-// Do special KISS packet processing here.  We save the last
-// character in port_data[port].channel2, as it is otherwise only
-// used for AX.25 ports.
-
-if ( (port_data[port].device_type == DEVICE_SERIAL_KISS_TNC)
-        || (port_data[port].device_type == DEVICE_SERIAL_MKISS_TNC) ) {
-
-    if (port_data[port].channel2 == KISS_FESC) { // Frame Escape char
-        if (cin == KISS_TFEND) { // Transposed Frame End char
-
-            // Save this char for next time around
-            port_data[port].channel2 = cin;
-
-            cin = KISS_FEND;
-        }
-        else if (cin == KISS_TFESC) { // Transposed Frame Escape char
-
-            // Save this char for next time around
-            port_data[port].channel2 = cin;
-
-            cin = KISS_FESC;
-        }
-        else {
-            port_data[port].channel2 = cin;
-        }
-    }
-    else if (port_data[port].channel2 == KISS_FEND) { // Frame End char
-        // Frame start or frame end.  Drop the next character which
-        // should either be another frame end or a type byte.
-
-// Note this "type" byte is where it specifies which KISS interface
-// the packet came from.  We may want to use this later for
-// multi-drop KISS or other types of KISS protocols.
-
-        // Save this char for next time around
-        port_data[port].channel2 = cin;
-//fprintf(stderr,"Byte: %02x\n", cin);
-        skip++;
-    }
-    else if (cin == KISS_FESC) { // Frame Escape char
-        port_data[port].channel2 = cin;
-        skip++;
-    }
-    else {
-        port_data[port].channel2 = cin;
-    }
-}   // End of first special KISS processing
-
-
-
-// We shouldn't see any AX.25 flag characters on a KISS interface
-// because they are stripped out by the KISS code.  What we should
-// see though are KISS_FEND characters at the beginning of each
-// packet.  These characters are where we should break the data
-// apart in order to send strings to the decode routines.  It may be
-// just fine to still break it on \r or \n chars, as the KISS_FEND
-// should appear immediately afterwards in properly formed packets.
-
-
-// This is how we know we're at the end of a KISS frame.
-if (cin == KISS_FEND)
-*/
 
 

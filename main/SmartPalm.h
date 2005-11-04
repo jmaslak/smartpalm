@@ -16,7 +16,7 @@
 #define VERSION_STRING ("SmartPalm 1.0 (beta)")
 
 // Do we want debug mode on?  If so, uncommment the next line
-#define DEBUG 1
+//#define DEBUG 1
 
 // The size of the serial receive buffer; Smaller might be better on older Palms
 #define SERIAL_BUFFER_SIZE (16384)
