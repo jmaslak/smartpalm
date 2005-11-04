@@ -35,6 +35,7 @@ void initConfiguration(void) {
 	conf.fast_beacon_rate = DEFAULT_FAST_BEACON_RATE;
 	conf.stop_beacon_rate = DEFAULT_STOP_BEACON_RATE;
     conf.enable_KISS      = DEFAULT_KISS_MODE;
+    conf.serial_baud_rate = DEFAULT_BAUD_RATE;
 }
 
 
