@@ -23,6 +23,7 @@ struct ConfigurationInfo {
 	int fast_beacon_rate;
 	int stop_beacon_rate;
     int enable_KISS;
+    int serial_baud_rate;
 };
 
 extern void   initconfiguration(void);
@@ -37,6 +38,7 @@ extern int    getTurnBeaconRate(void);
 extern int    getFastBeaconRate(void);
 extern int    getStopBeaconRate(void);
 extern int    getKissEnable(void);
+extern int    getSerialBaudRate(void);
 extern void   setDigipeaterPath(char * path);
 extern void   setCallsign(char * call);
 extern void   setLowSpeed(int speed);
@@ -46,6 +48,7 @@ extern void   setTurnBeaconRate(int rate);
 extern void   setFastBeaconRate(int rate);
 extern void   setStopBeaconRate(int rate);
 extern void   setKissEnable(int param);
+extern void   setSerialBaudRate(int param);
 extern int    configuredCallsign(void);
 
 #endif

@@ -179,6 +179,7 @@ static void APRSTncConfigurationUpdate(void)
     FrmSetControlValue(frm,
         FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss),
         getKissEnable());
+//APRSTncConfigurationSerialBaudRateField
 }
 
 

@@ -172,6 +172,15 @@ int getKissEnable(void)
 
 
 
+int getSerialBaudRate(void)
+{
+	return conf.serial_baud_rate;
+}
+
+
+
+
+
 void setDigipeaterPath(char * path)
 {
 	StrCopy(conf.digipeater_path, path);
@@ -256,6 +265,16 @@ void setStopBeaconRate(int rate)
 void setKissEnable(int param)
 {
 	conf.enable_KISS = param;
+    writeConfiguration();
+}
+
+
+
+
+
+void setSerialBaudRate(int param)
+{
+	conf.serial_baud_rate = param;
     writeConfiguration();
 }
 
