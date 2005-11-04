@@ -174,12 +174,16 @@ static void saveAPRSConfiguration(void)
 
 static void APRSTncConfigurationUpdate(void)
 {
+	char buffer[255];
+
+
 	FormPtr frm = FrmGetActiveForm();
 	
     FrmSetControlValue(frm,
         FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss),
         getKissEnable());
-//APRSTncConfigurationSerialBaudRateField
+
+    SetFieldTextFromStr(APRSTncConfigurationSerialBaudRateField, StrIToA(buffer, getSerialBaudRate()));
 }
 
 
@@ -227,6 +231,7 @@ Boolean APRSTncConfigurationHandleEvent(EventPtr event)
 //            saveAPRSConfiguration();
         }
 		else if (event->data.ctlSelect.controlID == APRSTncConfigurationApplyButton) {
+        	setSerialBaudRate(StrAToI(GetFieldText(APRSTncConfigurationSerialBaudRateField)));
 //			if((error = checkAPRSConfiguration()) == NULL) {
 //				saveAPRSConfiguration();
 //				tncConfig();

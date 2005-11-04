@@ -45,15 +45,16 @@ static void    EventLoop(void);
 /* Returns true on success, false on failure */
 static Boolean StartApplication(void)
 { 
-	if (!initSerial()) {
-		return false;
-	}
-
 	initStatus();
 	initSummary();
 	initStatistics();
 	initDatabase();
 	readConfiguration();
+
+	if (!initSerial()) {
+		return false;
+	}
+
 	tncInit();
 	tncConfig();
 	

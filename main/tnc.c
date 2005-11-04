@@ -50,13 +50,7 @@ Boolean initSerial(void) {
 	err = SysLibFind("Serial Library", &gSerialRefNum);
 	ErrFatalDisplayIf(err != 0, "Can't find serial library");
 
-
-//WE7U:
-// The user should be able to set the serial port baud rate instead
-// of having it hard-coded here.
-
-
-    err = SerOpen(gSerialRefNum, 0, 9600);
+    err = SerOpen(gSerialRefNum, 0, getSerialBaudRate() );
 	if (err != 0) {
 		if (err == serErrAlreadyOpen) {
 			FrmAlert(SerialInUseAlert);

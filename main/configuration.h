@@ -29,6 +29,7 @@ struct ConfigurationInfo {
 extern void   initconfiguration(void);
 extern void   writeConfiguration(void);
 extern void   readConfiguration (void);
+
 extern char * getDigipeaterPath(void);
 extern char * getCallsign(void);
 extern int    getLowSpeed(void);
@@ -39,6 +40,7 @@ extern int    getFastBeaconRate(void);
 extern int    getStopBeaconRate(void);
 extern int    getKissEnable(void);
 extern int    getSerialBaudRate(void);
+
 extern void   setDigipeaterPath(char * path);
 extern void   setCallsign(char * call);
 extern void   setLowSpeed(int speed);
@@ -49,6 +51,7 @@ extern void   setFastBeaconRate(int rate);
 extern void   setStopBeaconRate(int rate);
 extern void   setKissEnable(int param);
 extern void   setSerialBaudRate(int param);
+
 extern int    configuredCallsign(void);
 
 #endif
