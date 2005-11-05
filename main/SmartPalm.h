@@ -47,8 +47,13 @@
 #define DEFAULT_TURN_BEACON_RATE (10)
 #define DEFAULT_FAST_BEACON_RATE (180)
 #define DEFAULT_STOP_BEACON_RATE (600)
-#define DEFAULT_KISS_MODE        (0)
 #define DEFAULT_BAUD_RATE        (9600)
+#define DEFAULT_KISS_MODE        (0)
+#define DEFAULT_TX_DELAY         (350)
+#define DEFAULT_P_PERSISTENCE    (63)
+#define DEFAULT_SLOT_TIME        (100)
+#define DEFAULT_TX_TAIL          (0)
+#define DEFAULT_FULL_DUPLEX      (0)
 
 // Aren't you glad that PI != 4?
 #define PI (3.14159265359)

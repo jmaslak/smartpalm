@@ -31,13 +31,6 @@
 #define KISS_SETHARDWARE    0x06
 #define KISS_RETURN         0xff
 
-/*
-char   txdelay[4];      // KISS parameter
-char   persistence[4];  // KISS parameter
-char   slottime[4];     // KISS parameter
-char   txtail[4];       // KISS parameter
-int    fullduplex;      // KISS parameter
-*/
 
 
 extern Boolean initSerial(void);

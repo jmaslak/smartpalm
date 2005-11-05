@@ -34,8 +34,13 @@ void initConfiguration(void) {
 	conf.turn_beacon_rate = DEFAULT_TURN_BEACON_RATE;
 	conf.fast_beacon_rate = DEFAULT_FAST_BEACON_RATE;
 	conf.stop_beacon_rate = DEFAULT_STOP_BEACON_RATE;
-    conf.enable_KISS      = DEFAULT_KISS_MODE;
     conf.serial_baud_rate = DEFAULT_BAUD_RATE;
+    conf.enable_KISS      = DEFAULT_KISS_MODE;
+    conf.tx_delay         = DEFAULT_TX_DELAY;
+    conf.p_persistence    = DEFAULT_P_PERSISTENCE;
+    conf.slot_time        = DEFAULT_SLOT_TIME;
+    conf.tx_tail          = DEFAULT_TX_TAIL;
+    conf.full_duplex      = DEFAULT_FULL_DUPLEX;
 }
 
 
@@ -164,6 +169,15 @@ int getStopBeaconRate(void)
 
 
 
+int getSerialBaudRate(void)
+{
+	return conf.serial_baud_rate;
+}
+
+
+
+
+
 int getKissEnable(void)
 {
 	return conf.enable_KISS;
@@ -173,9 +187,48 @@ int getKissEnable(void)
 
 
 
-int getSerialBaudRate(void)
+// Returns TX Delay in milliseconds
+int getTxDelay(void)
 {
-	return conf.serial_baud_rate;
+	return(conf.tx_delay * 10);
+}
+
+
+
+
+
+int getPPersistence(void)
+{
+	return conf.p_persistence;
+}
+
+
+
+
+
+// Returns Slot Time in milliseconds
+int getSlotTime(void)
+{
+	return(conf.slot_time * 10);
+}
+
+
+
+
+
+// Returns Tx Tail Delay in milliseconds
+int getTxTail(void)
+{
+	return(conf.tx_tail * 10);
+}
+
+
+
+
+
+int getFullDuplex(void)
+{
+	return conf.full_duplex;
 }
 
 
@@ -263,6 +316,16 @@ void setStopBeaconRate(int rate)
 
 
 
+void setSerialBaudRate(int param)
+{
+	conf.serial_baud_rate = param;
+    writeConfiguration();
+}
+
+
+
+
+
 void setKissEnable(int param)
 {
 	conf.enable_KISS = param;
@@ -273,9 +336,55 @@ void setKissEnable(int param)
 
 
 
-void setSerialBaudRate(int param)
+// Set TX Delay in milliseconds, save it in ms/10 which is what the
+// TNC requires.  This way the display shows the real delay.
+void setTxDelay(int param)
 {
-	conf.serial_baud_rate = param;
+	conf.tx_delay = param / 10;
+    writeConfiguration();
+}
+
+
+
+
+
+void setPPersistence(int param)
+{
+	conf.p_persistence = param;
+    writeConfiguration();
+}
+
+
+
+
+
+// Set Slot Time in milliseconds, save it in ms/10 which is what the
+// TNC requires.  This way the display shows the real delay.
+void setSlotTime(int param)
+{
+	conf.slot_time = param / 10;
+    writeConfiguration();
+}
+
+
+
+
+
+// Set TX Tail Delay in milliseconds, save it in ms/10 which is what
+// the TNC requires.  This way the display shows the real delay.
+void setTxTail(int param)
+{
+	conf.tx_tail = param / 10;
+    writeConfiguration();
+}
+
+
+
+
+
+void setFullDuplex(int param)
+{
+	conf.full_duplex = param;
     writeConfiguration();
 }
 

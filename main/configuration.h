@@ -22,8 +22,13 @@ struct ConfigurationInfo {
 	int turn_beacon_rate;
 	int fast_beacon_rate;
 	int stop_beacon_rate;
-    int enable_KISS;
     int serial_baud_rate;
+    int enable_KISS;
+    int tx_delay;
+    int p_persistence;
+    int slot_time;
+    int tx_tail;
+    int full_duplex;
 };
 
 extern void   initconfiguration(void);
@@ -38,8 +43,13 @@ extern int    getTurnThreshold(void);
 extern int    getTurnBeaconRate(void);
 extern int    getFastBeaconRate(void);
 extern int    getStopBeaconRate(void);
-extern int    getKissEnable(void);
 extern int    getSerialBaudRate(void);
+extern int    getKissEnable(void);
+extern int    getTxDelay(void);
+extern int    getPPersistence(void);
+extern int    getSlotTime(void);
+extern int    getTxTail(void);
+extern int    getFullDuplex(void);
 
 extern void   setDigipeaterPath(char * path);
 extern void   setCallsign(char * call);
@@ -49,8 +59,13 @@ extern void   setTurnThreshold(int threshold);
 extern void   setTurnBeaconRate(int rate);
 extern void   setFastBeaconRate(int rate);
 extern void   setStopBeaconRate(int rate);
-extern void   setKissEnable(int param);
 extern void   setSerialBaudRate(int param);
+extern void   setKissEnable(int param);
+extern void   setTxDelay(int param);
+extern void   setPPersistence(int param);
+extern void   setSlotTime(int param);
+extern void   setTxTail(int param);
+extern void   setFullDuplex(int param);
 
 extern int    configuredCallsign(void);
 

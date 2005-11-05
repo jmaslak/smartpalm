@@ -58,11 +58,16 @@
 #define APRSConfigurationApplyButton		1012
 
 // Resource tFRM 1005
-#define APRSTncConfigurationForm			1005
-#define APRSTncConfigurationCancelButton	1006
-#define APRSTncConfigurationApplyButton		1007
-#define APRSTncConfigurationEnableKiss      1008
+#define APRSTncConfigurationForm			     1005
+#define APRSTncConfigurationCancelButton	     1006
+#define APRSTncConfigurationApplyButton		     1007
+#define APRSTncConfigurationEnableKiss           1008
 #define APRSTncConfigurationSerialBaudRateField  1009
+#define APRSTncConfigurationKissTxDelay          1010
+#define APRSTncConfigurationKissPPersistence     1011
+#define APRSTncConfigurationKissSlotTime         1012
+#define APRSTncConfigurationKissTxTail           1013
+#define APRSTncConfigurationKissFullDuplex       1014
 
 //	Resource tFRM 1003
 #define APRSReadForm				1003

@@ -175,15 +175,19 @@ static void saveAPRSConfiguration(void)
 static void APRSTncConfigurationUpdate(void)
 {
 	char buffer[255];
-
-
 	FormPtr frm = FrmGetActiveForm();
-	
+
+	SetFieldTextFromStr(APRSTncConfigurationSerialBaudRateField, StrIToA(buffer, getSerialBaudRate()));
     FrmSetControlValue(frm,
         FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss),
         getKissEnable());
-
-    SetFieldTextFromStr(APRSTncConfigurationSerialBaudRateField, StrIToA(buffer, getSerialBaudRate()));
+	SetFieldTextFromStr(APRSTncConfigurationKissTxDelay, StrIToA(buffer, getTxDelay()));
+	SetFieldTextFromStr(APRSTncConfigurationKissPPersistence, StrIToA(buffer, getPPersistence()));
+	SetFieldTextFromStr(APRSTncConfigurationKissSlotTime, StrIToA(buffer, getSlotTime()));
+	SetFieldTextFromStr(APRSTncConfigurationKissTxTail, StrIToA(buffer, getTxTail()));
+    FrmSetControlValue(frm,
+        FrmGetObjectIndex(frm, APRSTncConfigurationKissFullDuplex),
+        getFullDuplex());
 }
 
 
@@ -225,13 +229,31 @@ Boolean APRSTncConfigurationHandleEvent(EventPtr event)
 		break;
 
 	case ctlSelectEvent:
-        if (event->data.ctlSelect.controlID == APRSTncConfigurationEnableKiss) {
+		if (event->data.ctlSelect.controlID == APRSTncConfigurationApplyButton) {
             FormPtr frm = FrmGetActiveForm();
-            setKissEnable( FrmGetControlValue(frm, FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss)));
-//            saveAPRSConfiguration();
-        }
-		else if (event->data.ctlSelect.controlID == APRSTncConfigurationApplyButton) {
+
         	setSerialBaudRate(StrAToI(GetFieldText(APRSTncConfigurationSerialBaudRateField)));
+
+            setKissEnable( FrmGetControlValue(frm, FrmGetObjectIndex(frm, APRSTncConfigurationEnableKiss)));
+
+        	setTxDelay(StrAToI(GetFieldText(APRSTncConfigurationKissTxDelay)));
+            if (getTxDelay() < 0)   setTxDelay(0);
+            if (getTxDelay() > 500) setTxDelay(DEFAULT_TX_DELAY);
+
+        	setPPersistence(StrAToI(GetFieldText(APRSTncConfigurationKissPPersistence)));
+            if (getPPersistence() < 0)   setPPersistence(0);
+            if (getPPersistence() > 255) setPPersistence(DEFAULT_P_PERSISTENCE);
+
+        	setSlotTime(StrAToI(GetFieldText(APRSTncConfigurationKissSlotTime)));
+            if (getSlotTime() < 0)   setSlotTime(0);
+            if (getSlotTime() > 50) setSlotTime(DEFAULT_SLOT_TIME);
+
+        	setTxTail(StrAToI(GetFieldText(APRSTncConfigurationKissTxTail)));
+            if (getTxTail() < 0)   setTxTail(0);
+            if (getTxTail() > 25) setTxTail(DEFAULT_TX_TAIL);
+
+            setFullDuplex( FrmGetControlValue(frm, FrmGetObjectIndex(frm, APRSTncConfigurationKissFullDuplex)));
+
 //			if((error = checkAPRSConfiguration()) == NULL) {
 //				saveAPRSConfiguration();
 //				tncConfig();

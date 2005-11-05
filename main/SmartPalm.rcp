@@ -57,11 +57,32 @@ END
 FORM ID APRSTncConfigurationForm AT (0 0 160 160)
 BEGIN
 	TITLE "TNC Configuration"
-    LABEL "Baud Rate:" AUTOID AT (4 15) FONT 1    
-	FIELD ID APRSTncConfigurationSerialBaudRateField AT (65 15 30 20) UNDERLINED MULTIPLELINES EDITABLE FONT 0 MAXCHARS 6
-    CHECKBOX "Enable KISS Mode" ID APRSTncConfigurationEnableKiss AT (4 50 151 24) FONT 1
-	LABEL "KISS transmit is not implemented yet." AUTOID AT (4 70) FONT 0
-    LABEL "Coming soon to a Palm near you!" AUTOID AT (4 80) FONT 0
+
+    LABEL "Serial Baud Rate:" AUTOID AT (4 15) FONT 1    
+	FIELD ID APRSTncConfigurationSerialBaudRateField AT (100 15 20 15) UNDERLINED EDITABLE FONT 0 MAXCHARS 5
+
+    CHECKBOX "Enable KISS Mode" ID APRSTncConfigurationEnableKiss AT (4 30 105 14) FONT 1
+
+    LABEL "TXDelay:" AUTOID AT (20 45) FONT 1
+    FIELD ID APRSTncConfigurationKissTxDelay AT (100 45 15 11) UNDERLINED EDITABLE FONT 0 MAXCHARS 3
+    LABEL "ms" AUTOID AT (117 45) FONT 1
+
+    LABEL "PPersistence:" AUTOID AT (20 60) FONT 1
+    FIELD ID APRSTncConfigurationKissPPersistence AT (100 60 15 11) UNDERLINED EDITABLE FONT 0 MAXCHARS 3
+    LABEL "/255" AUTOID AT (117 60) FONT 1
+
+    LABEL "Slot Time:" AUTOID AT (20 75) FONT 1
+    FIELD ID APRSTncConfigurationKissSlotTime AT (100 75 15 11) UNDERLINED EDITABLE FONT 0 MAXCHARS 3
+    LABEL "ms" AUTOID AT (117 75) FONT 1
+
+    LABEL "TxTail:" AUTOID AT (20 90) FONT 1
+    FIELD ID APRSTncConfigurationKissTxTail AT (100 90 15 11) UNDERLINED EDITABLE FONT 0 MAXCHARS 3
+    LABEL "ms" AUTOID AT (117 90) FONT 1
+
+    CHECKBOX "Enable Full Duplex" ID APRSTncConfigurationKissFullDuplex AT (20 105 105 14) FONT 1
+
+LABEL "KISS transmit is not implemented yet" AUTOID AT (4 120) FONT 0
+
 	BUTTON "OK" ID APRSTncConfigurationApplyButton AT (40 140 35 16)
 	BUTTON "Cancel" ID APRSTncConfigurationCancelButton AT (90 140 35 16)
     GRAFFITISTATEINDICATOR AT (100 100)
