@@ -496,7 +496,6 @@ static Boolean getSerialCharacter(unsigned char *theData, int *current_character
             }
 
             else {
-
                 // It's a normal character (not one of the special
                 // KISS characters).  Increment the buffer pointer.
                 //

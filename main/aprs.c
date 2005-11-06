@@ -57,6 +57,7 @@ void handlePacket(unsigned char * theData) {
 	float mylat, mylon;
 	int speed, heading;
 	UInt32 utc;
+    int len;
 	
 	if (theData[0] == '\0') { return; }
 	
@@ -64,6 +65,21 @@ void handlePacket(unsigned char * theData) {
 	if (!StrNCompare(theData, "cmd:", 4)) {
 		theData = theData + 4;
 	}
+
+    // Strip off any <CR> or <LF> at the end of the line.  Do it
+    // twice in case we have both at the end of the line.
+    //
+    len = StrLen(theData);
+    if (len > 1) {
+        if (theData[len-1] == 13 || theData[len-1] == 10) {
+            theData[len-1] = '\0';
+        }
+    }
+    if (len > 2) {
+        if (theData[len-2] == 13 || theData[len-2] == 10) {
+            theData[len-2] = '\0';
+        }
+    }
 	
 	if (!StrNCompare(theData, "$GPRMC", 6)) {
 		handleGPRMC(theData, &mylat, &mylon, &speed, &heading, &utc);
