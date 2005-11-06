@@ -106,11 +106,15 @@ Boolean APRSSendHandleEvent(EventPtr event)
 			}
 
 			if (StrLen(buffer) > 0) {
-				tncSend("UNPROTO APZPAD via ");
-				tncSend(buffer);
-				tncSend("\r");
+				tncSend("UNPROTO ", 0);
+                tncSend(DESTINATION, 0);
+                tncSend(" via ", 0);
+				tncSend(buffer, 0);
+				tncSend("\r", 0);
 			} else {
-				tncSend("UNPROTO APZPAD\r");
+				tncSend("UNPROTO ", 0);
+                tncSend(DESTINATION, 0);
+                tncSend("\r", 0);
 			}
 
 			StrCopy(formatted_call, GetFieldText(APRSSendCallField));

@@ -39,7 +39,7 @@ extern void    tncSendPacket (char * s);
 extern Boolean processPendingSerialCharacter (unsigned int timeout);
 extern void    tncConfig(void);
 extern void    tncInit(void);
-extern void    tncSend(char * s);
+extern void    tncSend(char * s, int length);
 
 #endif
 

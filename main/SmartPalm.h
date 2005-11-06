@@ -15,6 +15,8 @@
 
 #define VERSION_STRING ("SmartPalm 1.0 (beta)")
 
+#define DESTINATION ("APZPAD")
+
 // Do we want debug mode on?  If so, uncommment the next line
 //#define DEBUG 1
 

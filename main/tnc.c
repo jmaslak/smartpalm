@@ -598,27 +598,27 @@ Boolean processPendingSerialCharacter (unsigned int timeout) {
 
 
 
-void tncSend (char *s)
+void tncSend (char *s, int length)
 {
 	Err err;
 
     // Check whether we're using KISS protocol.  If so, we
-    // process each character and the buffer differently.
+    // use the "length" parameter, else we use StrLen().
     //
-    if (!getKissEnable()) {
+    if (getKissEnable()) {
+        //
+        // KISS TNC mode
+        //
+    	SerSend(gSerialRefNum, s, length, &err);
+    }
+    else {
         //
         // Normal command-line TNC mode
         //
     	SerSend(gSerialRefNum, s, StrLen(s), &err);
-
-    	if (err == serErrLineErr) {
-    		SerClearErr(gSerialRefNum);
-    	}
     }
-    else {
-        //
-        // KISS TNC mode
-        //
+    if (err == serErrLineErr) {
+        SerClearErr(gSerialRefNum);
     }
 }
 
@@ -628,17 +628,82 @@ void tncSend (char *s)
 
 void tncConfig (void)
 {
-	tncSend("MYCALL ");
-	tncSend(getCallsign());
-	tncSend("\r");
+    if (!getKissEnable()) {
+        //
+        // Normal command-line TNC mode
+        //
+        tncSend("MYCALL ", 0);
+        tncSend(getCallsign(), 0);
+        tncSend("\r", 0);
 	
-	if (StrLen(getDigipeaterPath()) > 0) {
-		tncSend("UNPROTO APZPAD via ");
-		tncSend(getDigipeaterPath());
-		tncSend("\r");
-	} else {
-		tncSend("UNPROTO APZPAD\r");
-	}
+        if (StrLen(getDigipeaterPath()) > 0) {
+            tncSend("UNPROTO ", 0);
+            tncSend(DESTINATION, 0);
+            tncSend(" via ", 0);
+            tncSend(getDigipeaterPath(), 0);
+            tncSend("\r", 0);
+        } else {
+            tncSend("UNPROTO ", 0);
+            tncSend(DESTINATION, 0);
+            tncSend("\r", 0);
+        }
+    }
+}
+
+
+
+
+
+// This function was originally written for the GPL'ed Xastir
+// project by Curt Mills, WE7U.  The code for this function is
+// hereby released under the SmartPalm BSD-style license.
+//
+// Send a KISS configuration command to the selected port.
+// The KISS spec allows up to 16 devices to be configured.  We
+// support that here with the "device" input, which should be
+// between 0 and 15.  The commands accepted are integer values:
+//
+// 0x01 TXDELAY
+// 0x02 P-Persistence
+// 0x03 SlotTime
+// 0x04 TxTail
+// 0x05 FullDuplex
+// 0x06 SetHardware
+// 0xff Exit from KISS mode (not implemented yet)
+//
+void send_kiss_config(int device, int command, int value) {
+    unsigned char transmit_txt[6];
+    int len = 0;
+
+
+    if (device < 0 || device > 15) {
+//        fprintf(stderr,"send_kiss_config: out-of-range value for device\n");
+        return;
+    }
+
+    if (command < 1 || command > 6) {
+//        fprintf(stderr,"send_kiss_config: out-of-range value for command\n");
+        return;
+    }
+
+    if (value < 0 || value > 255) {
+//        fprintf(stderr,"send_kiss_config: out-of-range value for value\n");
+        return;
+    }
+
+    // Add the KISS framing characters and do the proper escapes.
+    transmit_txt[len++] = KISS_FEND;
+    transmit_txt[len++] = (device << 4) | (command & 0x0f);
+    transmit_txt[len++] = value & 0xff;
+    transmit_txt[len++] = KISS_FEND;
+
+    // Terminate the string, but don't increment the 'len' counter.
+    // We don't want to send the NULL byte out the KISS interface,
+    // just make sure the string is terminated in all cases.
+    //
+    transmit_txt[len] = '\0';
+
+    tncSend(transmit_txt, len);
 }
 
 
@@ -647,35 +712,32 @@ void tncConfig (void)
 
 void tncInit(void)
 {
-	tncSend("\r\3\r\r");
+    if (getKissEnable()) {
+        //
+        // KISS TNC mode
+        //
+        send_kiss_config(0,1,getTxDelay());
+        send_kiss_config(0,2,getPPersistence());
+        send_kiss_config(0,3,getSlotTime());
+        send_kiss_config(0,4,getTxTail());
+        send_kiss_config(0,5,getFullDuplex());
+    }
+    else {
+        //
+        // Normal command-line TNC mode
+        //
+        tncSend("\r\3\r\r", 0);
 
-	tncSend("CR ON\r");
-	tncSend("LOC EVERY 0\r");
-	tncSend("ECHO OFF\r");
-	tncSend("XFLOW OFF\r");
-	tncSend("AUTOLF OFF\r");
-	tncSend("GPSTEXT $GPRMC\r");
-	tncSend("LTMON 1\r");
-	tncSend("LTMHEAD OFF\r");
-	tncSend("BBSMSGS ON\r\r");
-}
-
-
-
-
-
-void tncSendPacket (char *s)
-{
-	if (!configuredCallsign()) { return; }
-	
-	tncSend("k\r");
-	tncSend(s);
-	tncSend("\r\3\r\r");
-
-	updateNetworkHistory();
-	clearDigipeatCount();
-
-	SndPlaySystemSound(sndWarning);
+        tncSend("CR ON\r", 0);
+        tncSend("LOC EVERY 0\r", 0);
+        tncSend("ECHO OFF\r", 0);
+        tncSend("XFLOW OFF\r", 0);
+        tncSend("AUTOLF OFF\r", 0);
+        tncSend("GPSTEXT $GPRMC\r", 0);
+        tncSend("LTMON 1\r", 0);
+        tncSend("LTMHEAD OFF\r", 0);
+        tncSend("BBSMSGS ON\r\r", 0);
+    }
 }
 
 
@@ -730,8 +792,7 @@ void fix_up_callsign(unsigned char *data) {
     if ( (i < (int)strlen((const char *)data)) && (data[i++] == '-')) {   // We might have an SSID
         if (data[i] != '\0')
             ssid = atoi((const char *)&data[i]);
-//            ssid = data[i++] - 0x30;    // Convert from ascii to
-//            int
+//            ssid = data[i++] - 0x30; // Convert from ascii to int
 //        if (data[i] != '\0')
 //            ssid = (ssid * 10) + (data[i] - 0x30);
     }
@@ -883,11 +944,8 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
     transmit_txt2[j] = '\0';
 
 
-// Transmit data.  The normal method would be to call tncSend(s).
-// That won't work in this case as we need to be able to send 0x00
-// characters.
-
-
+    // Transmit data.
+    tncSend(transmit_txt2, j);
 
 // DEBUG.  Dump out the hex codes for the KISS packet we just
 // created.
@@ -904,90 +962,34 @@ void send_ax25_frame(char *source, char *destination, char *path, char *data) {
 
 
 
-// This function was originally written for the GPL'ed Xastir
-// project by Curt Mills, WE7U.  The code for this function is
-// hereby released under the SmartPalm BSD-style license.
-//
-// Send a KISS configuration command to the selected port.
-// The KISS spec allows up to 16 devices to be configured.  We
-// support that here with the "device" input, which should be
-// between 0 and 15.  The commands accepted are integer values:
-//
-// 0x01 TXDELAY
-// 0x02 P-Persistence
-// 0x03 SlotTime
-// 0x04 TxTail
-// 0x05 FullDuplex
-// 0x06 SetHardware
-// 0xff Exit from KISS mode (not implemented yet)
-//
-void send_kiss_config(int device, int command, int value) {
-    unsigned char transmit_txt[MAX_LINE_SIZE+1];
-    int i, j;
-    int erd;
-//    int write_in_pos_hold;
-
-
-    if (device < 0 || device > 15) {
-//        fprintf(stderr,"send_kiss_config: out-of-range value for device\n");
+void tncSendPacket (char *info)
+{
+	if (!configuredCallsign()) {
         return;
     }
 
-    if (command < 1 || command > 6) {
-//        fprintf(stderr,"send_kiss_config: out-of-range value for command\n");
-        return;
+    if (getKissEnable()) {
+        //
+        // KISS TNC mode
+        //
+        send_ax25_frame(getCallsign(), // source address
+            DESTINATION,               // destination address
+            getDigipeaterPath(),       // path
+            info);                     // info field
+    }
+    else {
+        //
+        // Normal command-line TNC mode
+        //
+        tncSend("k\r", 0);
+        tncSend(info, 0);
+        tncSend("\r\3\r\r", 0);
     }
 
-    if (value < 0 || value > 255) {
-//        fprintf(stderr,"send_kiss_config: out-of-range value for value\n");
-        return;
-    }
+    updateNetworkHistory();
+    clearDigipeatCount();
 
-    // Add the KISS framing characters and do the proper escapes.
-    j = 0;
-    transmit_txt[j++] = KISS_FEND;
-
-    transmit_txt[j++] = (device << 4) | (command & 0x0f);
-
-    transmit_txt[j++] = value & 0xff;
-
-    transmit_txt[j++] = KISS_FEND;
-
-    // Terminate the string, but don't increment the 'j' counter.
-    // We don't want to send the NULL byte out the KISS interface,
-    // just make sure the string is terminated in all cases.
-    //
-    transmit_txt[j] = '\0';
-
-
-
-
-//-------------------------------------------------------------------
-// Had to snag code from port_write_string() below because our
-// string
-// needs to have 0x00 chars inside it.  port_write_string() can't
-// handle that case.  It's a good thing the transmit queue stuff
-// could handle it.
-//-------------------------------------------------------------------
-
-    erd = 0;
-
-//    write_in_pos_hold = port_data[port].write_in_pos;
-
-    for (i = 0; i < j && !erd; i++) {
-//        port_data[port].device_write_buffer[port_data[port].write_in_pos++] = transmit_txt[i];
-//        if (port_data[port].write_in_pos >= MAX_DEVICE_BUFFER)
-//            port_data[port].write_in_pos = 0;
-
-//        if (port_data[port].write_in_pos == port_data[port].write_out_pos) {
-//                fprintf(stderr,"Port %d Buffer overrun\n",port);
-
-            /* clear this restore original write_in pos and dump * this string */
-//            port_data[port].write_in_pos = write_in_pos_hold;
-//            port_data[port].errors++;
-            erd = 1;
-//        }
-    }
+    SndPlaySystemSound(sndWarning);
 }
 
 

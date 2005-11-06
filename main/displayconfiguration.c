@@ -257,6 +257,7 @@ Boolean APRSTncConfigurationHandleEvent(EventPtr event)
 //			if((error = checkAPRSConfiguration()) == NULL) {
 //				saveAPRSConfiguration();
 //				tncConfig();
+                tncInit();
 //				APRSConfigurationUpdate();
 				FrmGotoForm(APRSSummaryForm);
 //			} else {

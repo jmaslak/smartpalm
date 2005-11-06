@@ -81,7 +81,7 @@ BEGIN
 
     CHECKBOX "Enable Full Duplex" ID APRSTncConfigurationKissFullDuplex AT (20 105 105 14) FONT 1
 
-LABEL "KISS transmit is not implemented yet" AUTOID AT (4 120) FONT 0
+//LABEL "KISS transmit is not implemented yet" AUTOID AT (4 120) FONT 0
 
 	BUTTON "OK" ID APRSTncConfigurationApplyButton AT (40 140 35 16)
 	BUTTON "Cancel" ID APRSTncConfigurationCancelButton AT (90 140 35 16)
