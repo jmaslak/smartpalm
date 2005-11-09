@@ -717,11 +717,19 @@ void tncInit(void)
         //
         // KISS TNC mode
         //
-        send_kiss_config(0,1,getTxDelay());
-        send_kiss_config(0,2,getPPersistence());
-        send_kiss_config(0,3,getSlotTime());
-        send_kiss_config(0,4,getTxTail());
-        send_kiss_config(0,5,getFullDuplex());
+
+        // Change to 10ms units per KISS spec
+        send_kiss_config( 0, 1, getTxDelay()      / 10 );
+
+        send_kiss_config( 0, 2, getPPersistence()      );
+
+        // Change to 10ms units per KISS spec
+        send_kiss_config( 0, 3, getSlotTime()     / 10 );
+
+        // Change to 10ms units per KISS spec
+        send_kiss_config( 0, 4, getTxTail()       / 10 );
+
+        send_kiss_config( 0, 5, getFullDuplex()        );
     }
     else {
         //
