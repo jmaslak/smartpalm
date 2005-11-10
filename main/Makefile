@@ -22,12 +22,11 @@ OBJS=aprs.o displayconfiguration.o displaysummary.o statistics.o configuration.o
 CRID=APRD
 NAME="SmartPalm APRS"
 
+all:	$(APP).prc
+
 dist: $(APP).prc
 	zip smartpalm.zip SmartPalm.prc INSTALL LICENSE README
 	tar czvf smartpalm.tgz SmartPalm.prc INSTALL LICENSE README
-
-
-all:	$(APP).prc
 
 $(APP).prc: $(APP) bin.stamp grc.stamp
 	build-prc --creator $(CRID) --type appl --name $(NAME) -o $(APP).prc  *.grc *.bin
@@ -50,6 +49,9 @@ bin.stamp: $(RCPFILE)
 	touch bin.stamp
 
 clean:
+	-rm -f $(OBJS) $(APP) $(APP).prc *.bin bin.stamp *.grc grc.stamp *\~
+
+distclean:
 	-rm -f $(OBJS) $(APP) $(APP).prc *.bin bin.stamp *.grc grc.stamp *\~ smartpalm.zip smartpalm.tgz
 
 depend:
