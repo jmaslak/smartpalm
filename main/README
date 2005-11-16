@@ -8,18 +8,18 @@ Copyright (c) 2001, Joel C. Maslak
 This is a VERY preliminary version of the manual for
 SmartPalm.  I would love someone to write a more complete manual.
 
-This software is not intended for anyone but APRS experts right now.  The
-program doesn't do a lot to help a user, nor is it very easy to
-use.  Hopefully, this will get better over time.
+This software is not intended for anyone but APRS(tm) experts right
+now.  The program doesn't do a lot to help a user, nor is it very
+easy to use.  Hopefully, this will get better over time.
 
 Note that the Alinco 135 (with the built in TNC) is the only radio/TNC
 supported.  It's also assumed that you have a GPS unit hooked up to the
 Alinco.  This software will not work with any other TNCs, although I hope
 to make it support the KPC 3+ soon.
 
-APRS SUMMARY DISPLAY:
+APRS(tm) SUMMARY DISPLAY:
 
-The "main" screen you see in SmartPalm is the "APRS Summary" screen.
+The "main" screen you see in SmartPalm is the "APRS(tm) Summary" screen.
 
 Here's an example screen:
 
@@ -106,4 +106,6 @@ When a new message is received, and the user is viewing the summary
 screen, the system will go into the "Received Message Screen".  It will
 display each message until you hit okay.
 
+
+APRS(tm) is a Trademark of Bob Bruninga, WB4APR.
 
