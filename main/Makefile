@@ -20,7 +20,7 @@ APP=SmartPalm
 RCPFILE=$(APP).rcp
 OBJS=aprs.o displayconfiguration.o displaysummary.o statistics.o configuration.o displayread.o main.o tnc.o database.o displaysend.o receivedmessage.o utils.o 
 CRID=APRD
-NAME="SmartPalm APRS"
+NAME="SmartPalm"
 
 all:	$(APP).prc
 
