@@ -4,7 +4,7 @@
  * tnc.h
  *
  * SmartPalm Mobile APRS Display
- * Copyright (c) 2001, Joel C. Maslak
+ * Copyright (c) 2001, Joelle Maslak
  * Portions Copyright (c) 2005, Curtis E. Mills, WE7U
  * All Rights Reserved (see license)
  *
