@@ -29,7 +29,7 @@ Run "palmdev-prep"
 
 As a normal user:
 -----------------
-cd SmartPalm/main
+cd SmartPalm
 make
 
 The last resulted in a file called "SmartPalm.prc" being created.
